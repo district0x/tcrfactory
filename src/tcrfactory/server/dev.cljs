@@ -20,7 +20,8 @@
     [tcrfactory.server.db]
     [tcrfactory.server.deployer]
     [tcrfactory.server.generator]
-    [tcrfactory.server.graphql-mock-root-value :refer [graphql-mock-root-value]]
+    #_[tcrfactory.server.graphql-mock-root-value :refer [graphql-mock-root-value]]
+    [tcrfactory.server.graphql-resolvers :refer [graphql-resolvers]]
     [tcrfactory.server.syncer]
     [tcrfactory.shared.graphql-schema :refer [graphql-schema]]
     [tcrfactory.shared.smart-contracts]))
@@ -71,7 +72,7 @@
                             :graphql {:port 6400
                                       :middlewares [logging-middlewares]
                                       :schema graphql-schema
-                                      :root-value graphql-mock-root-value
+                                      :root-value graphql-resolvers
                                       :path "/graphql"
                                       :graphiql true}
                             :web3 {:port 8549}
@@ -91,7 +92,3 @@
     pprint/pprint))
 
 (set! *main-cli-fn* -main)
-
-
-
-
