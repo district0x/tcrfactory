@@ -21,7 +21,6 @@
             [tcrfactory.shared.graphql-schema :refer [graphql-schema]]
             tcrfactory.shared.smart-contracts))
 
-
 (nodejs/enable-util-print!)
 
 (def graphql-module (nodejs/require "graphql"))
@@ -30,7 +29,6 @@
 
 (defn on-jsload []
   (graphql/restart {:root-value graphql-resolvers :schema graphql-schema}))
-
 
 (defn deploy-to-mainnet []
   (mount/stop #'district.server.web3/web3
@@ -43,7 +41,6 @@
                          #'district.server.web3/web3
                          #'district.server.smart-contracts/smart-contracts))
 
-
 (defn redeploy []
   (mount/stop)
   (-> (mount/with-args
@@ -52,7 +49,6 @@
          {:deployer {:write? true}}))
       (mount/start)
       pprint/pprint))
-
 
 (defn resync []
   (mount.core/stop #'tcrfactory.server.db/tcrfactory-db
