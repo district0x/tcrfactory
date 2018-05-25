@@ -21,3 +21,5 @@ pom.xml.asc
 /node_modules/
 /figwheel_server.log
 /tcrfactory.iml
+/resources/public/js/compiled/
+

@@ -1,6 +1,0 @@
-// Compiled by ClojureScript 1.10.238 {}
-goog.provide('tcrfactory.shared.routes');
-goog.require('cljs.core');
-tcrfactory.shared.routes.routes = new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["/",new cljs.core.Keyword("route","home","route/home",-250934710)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["/search-registries",new cljs.core.Keyword("route","search-registries","route/search-registries",541007965)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["/create-registry",new cljs.core.Keyword("route","create-registry","route/create-registry",-191147550)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["/registry/:registry-address",new cljs.core.Keyword("route","registry-detail","route/registry-detail",811804779)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["/registry/:registry-address/submit",new cljs.core.Keyword("route","create-registry-entry","route/create-registry-entry",-1339941717)], null)], null);
-
-//# sourceMappingURL=routes.js.map?rel=1526737064324
