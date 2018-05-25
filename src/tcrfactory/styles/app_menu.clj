@@ -10,6 +10,7 @@
   [:.app-menu
    {:display :flex
     :align-items :center
+    :justify-content :flex-start
     :background (color "white")}
    [:.node
     {:border "1px"
