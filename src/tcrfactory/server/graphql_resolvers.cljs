@@ -36,7 +36,7 @@
 (def graphql-resolvers
 
   {:registry registry-resolver 
-   :search-registries search-registries-resolver }))
+   :search-registries search-registries-resolver })
 
 ;;;;;;;;;;;
 ;; Tests ;;
@@ -64,4 +64,3 @@
                           :registry/description]]]})
 
   )
-======= end

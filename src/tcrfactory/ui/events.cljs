@@ -63,7 +63,7 @@
                     (:registry/commit-period-duration args)
                     (:registry/reveal-period-duration args)
                     (:registry/deposit args)])
-    {:dispatch [::tx-events/send-tx {:instance (contract-q/instance db :registry-factory)
+    (let [call {:instance (contract-q/instance db :registry-factory)
                                      :fn :create-registry
                                      :args [(:registry/title args)
                                             (:registry/description args)
@@ -79,7 +79,9 @@
                                                :gas 6200000}
                                      :on-tx-success [:create-registry-success]
                                      :on-tx-hash-error [:create-registry-error]
-                                     :on-tx-error [:create-registry-error]}]}))
+                :on-tx-error [:create-registry-error]}]
+      (println call)
+      {:dispatch [::tx-events/send-tx call]})))
 
 
 (reg-event-fx
