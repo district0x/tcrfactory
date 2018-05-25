@@ -61,6 +61,7 @@
             [lein-pdo "0.1.1"]]
 
   :npm {:dependencies [#_[semantic-ui "2.2.14"]
+                       [graphql-fields "1.0.2"]
                        [solc "0.4.20"]
                        [source-map-support "0.5.3"]
                        [ws "4.0.0"]]}

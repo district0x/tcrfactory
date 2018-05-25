@@ -18,8 +18,19 @@
 
 (def enum graphql-utils/kw->gql-name)
 
+(def graphql-fields (nodejs/require "graphql-fields"))
+
 (defn- last-block-timestamp []
   (->> (web3-eth/block-number @web3/web3) (web3-eth/get-block @web3/web3) :timestamp))
+
+(defn- resolver-fields
+  "Returns the first order fields"
+  [info] (->> (-> info
+                  graphql-fields
+                  js->clj)
+              keys
+              (map graphql-utils/gql-name->kw)
+              set))
 
 (defn reg-entry-status [now {:keys [:reg-entry/created-on :reg-entry/challenge-period-end :challenge/challenger
                                     :challenge/commit-period-end :challenge/commit-period-end
@@ -35,28 +46,34 @@
 
 (defn registry-entries-resolver [{:keys [:reg-entry/registry :reg-entry/status] :as args} context document]
   (log/info "registry-entries resolver args" args)
-
-  (let [sql-query (db/all {:select [:*]
+  (let [fields (resolver-fields document)
+        sql-query (db/all {:select (into [:challenge/votes-for
+                                          :challenge/votes-against]
+                                         (filter #(contains? (set meme-db/registry-entries-column-names) %) fields))
                            :from [:reg-entries]
                            :where [:= registry :reg-entries.reg-entry/registry]})
         now (last-block-timestamp)]
+    (log/info "registry-entries fields" (look fields))
     (reduce (fn [m {:keys [:challenge/votes-for :challenge/votes-against] :as reg-entry}]
-              (log/info status (look (reg-entry-status now reg-entry)))
+              (log/info status (reg-entry-status now reg-entry))
               (if (= status (reg-entry-status now reg-entry))
                 (conj m (merge reg-entry
-                               {:reg-entry/status (enum status)
-                                :challenge/votes-total (+ votes-for votes-against)}))
+                               (when (contains? fields :reg-entry/status) {:reg-entry/status (enum status)})
+                               (when (contains? fields :reg-entry/status) {:challenge/votes-total (+ votes-for votes-against)})))
                 m))
             []
             sql-query)))
 
 (defn registry-resolver [{:keys [:registry/address] :as args} context document]
   (log/info "registry resolver args" args)
-  (merge (db/get {:select [:*]
-                  :from [:registries]
-                  :where [:= address :registries.registry/address]})
-         {:registry/entries (fn [{:keys [:status] :as args} context document]
-                              (registry-entries-resolver {:reg-entry/registry address :reg-entry/status (graphql-utils/gql-name->kw status)} context document))}))
+  (let [fields (resolver-fields document)]
+    (merge (db/get {:select (into [:registry/address]
+                                  (filter #(contains? (set meme-db/registries-column-names) %) fields)) #_[:*]
+                    :from [:registries]
+                    :where [:= address :registries.registry/address]})
+           {:registry/entries (fn [{:keys [:status] :as args} context document]
+                                (registry-entries-resolver {:reg-entry/registry address
+                                                            :reg-entry/status (graphql-utils/gql-name->kw status)} context document))})))
 
 (defn search-registries-resolver [{:keys [keyword] :as args} context document]
   (log/info ":registry " args)
