@@ -13,15 +13,16 @@
             [print.foo :include-macros true :refer [look]]
             [clojure.string :as str]))
 
+(defn registry-entries-resolver [args context document]
+(log/info "registry-entries resolver args" args)
+  {})
+
+(defn registry-resolver [{:keys [:registry/address] :as args} context document]
+  (log/info "registry resolver args" args)
+  (merge (db/get {:select [:*]
+                  :from [:registries]
+                  :where [:= address :registries.registry/address]})
+         {:registry/entries (registry-entries-resolver args context document)}))
+
 (def graphql-resolvers
-  {:registry (fn [{:keys [:registry/address] :as args} context document]
-               (merge (db/get {:select [:*]
-                               :from [:registries]
-                               :where [:= address :registries.registry/address]})
-                      :registry/entries (fn [args context document]
-
-                                          )))
-
-
-
-   })
+  {:registry registry-resolver})
