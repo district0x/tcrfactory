@@ -13,15 +13,15 @@
 (def interceptors [trim-v])
 
 (comment
-  (dispatch [:create-registry {:title "Top HODL Tokens for 2018"
-                               :description "Best tokens to hodl in 2018"
-                               :total-supply (web3/to-wei 1000000 :ether)
-                               :token-name "HODL"
-                               :token-symbol "HODL"
-                               :challenge-period-duration 300
-                               :commit-period-duration 300
-                               :reveal-period-duration 300
-                               :deposit (web3/to-wei 10 :ether)}])
+  (dispatch [:create-registry {:registry/title "Top HODL Tokens for 2018"
+                               :registry/description "Best tokens to hodl in 2018"
+                               :registry/total-supply (web3/to-wei 1000000 :ether)
+                               :registry/token-name "HODL"
+                               :registry/token-symbol "HODL"
+                               :registry/challenge-period-duration 300
+                               :registry/commit-period-duration 300
+                               :registry/reveal-period-duration 300
+                               :registry/deposit (web3/to-wei 10 :ether)}])
 
   (dispatch [:create-registry-entry {:registry-entry-factory "0x93b7e67938ffbbd430d2a9744f73b3be51bf203d"
                                      :registry-token "0x1642d08eb9d06e8142a8ab1c20b6476acbb2b039"
@@ -52,18 +52,29 @@
   :create-registry
   interceptors
   (fn [{:keys [db]} [args]]
+    (println args)
+    (println [(:registry/title args)
+                    (:registry/description args)
+                    (:registry/token-name args)
+                    (:registry/token-symbol args)
+                    (:registry/total-supply args)
+                    (contract-q/contract-address db :minime-token-factory)
+                    (:registry/challenge-period-duration args)
+                    (:registry/commit-period-duration args)
+                    (:registry/reveal-period-duration args)
+                    (:registry/deposit args)])
     {:dispatch [::tx-events/send-tx {:instance (contract-q/instance db :registry-factory)
                                      :fn :create-registry
-                                     :args [(:title args)
-                                            (:description args)
-                                            (:token-name args)
-                                            (:token-symbol args)
-                                            (:total-supply args)
+                                     :args [(:registry/title args)
+                                            (:registry/description args)
+                                            (:registry/token-name args)
+                                            (:registry/token-symbol args)
+                                            (:registry/total-supply args)
                                             (contract-q/contract-address db :minime-token-factory)
-                                            (:challenge-period-duration args)
-                                            (:commit-period-duration args)
-                                            (:reveal-period-duration args)
-                                            (:deposit args)]
+                                            (:registry/challenge-period-duration args)
+                                            (:registry/commit-period-duration args)
+                                            (:registry/reveal-period-duration args)
+                                            (:registry/deposit args)]
                                      :tx-opts {:from (accounts-q/active-account db)
                                                :gas 6200000}
                                      :on-tx-success [:create-registry-success]
