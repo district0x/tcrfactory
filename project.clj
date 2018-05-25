@@ -84,8 +84,8 @@
              :css-dirs ["resources/public/css"]
              :repl-eval-timeout 30000}
 
-  :aliases {"watch-css" ["shell" "./semantic.sh" "watch"]
-            "build-css" ["shell" "./semantic.sh" "build-css"]
+  :aliases {"watch-semantic" ["shell" "./semantic.sh" "watch"]
+            "build-semantic" ["shell" "./semantic.sh" "build-css"]
             "test" ["do" ["build-tests"] ["shell" "node" "smart-contracts-tests/smart-contracts-tests.js"]]
             "build-tests" ["cljsbuild" "once" "smart-contracts-tests"]
             "test-dev" ["doo" "node" "smart-contracts-tests"]}
