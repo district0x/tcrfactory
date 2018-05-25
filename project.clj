@@ -58,7 +58,8 @@
             [lein-solc "1.0.0"]
             [lein-doo "0.1.8"]
             [lein-npm "0.6.2"]
-            [lein-pdo "0.1.1"]]
+            [lein-pdo "0.1.1"]
+            [lein-garden "0.3.0"]]
 
   :npm {:dependencies [#_[semantic-ui "2.2.14"]
                        [graphql-fields "1.0.2"]
@@ -97,6 +98,14 @@
                    :source-paths ["dev" "src"]
                    :resource-paths ["resources"]}}
 
+  :garden {:builds [{:id "screen"
+                     :source-paths ["src"]
+                     :stylesheet tcrfactory.styles.core/main
+                     ;; Compiler flags passed to `garden.core/css`:
+                     :compiler {;; Where to save the file:
+                                :output-to "resources/public/css/main.css"
+                                ;; Compress the output?
+                                :pretty-print? false}}]}
 
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src/tcrfactory/ui" "src/tcrfactory/shared"]
