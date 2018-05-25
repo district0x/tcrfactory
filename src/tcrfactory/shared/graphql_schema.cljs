@@ -29,7 +29,7 @@
     registry_challengePeriodDuration: Int
     registry_commitPeriodDuration: Int
     registry_revealPeriodDuration: Int
-    registry_deposit: Int
+    registry_deposit: Float
     registry_entries(status: RegEntryStatus): [RegEntry]
   }
 

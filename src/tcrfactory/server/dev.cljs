@@ -29,8 +29,7 @@
 (def visit (aget graphql-module "visit"))
 
 (defn on-jsload []
-  (graphql/restart {:root-value {} :schema graphql-schema}))
-
+  (graphql/restart {:root-value graphql-resolvers :schema graphql-schema}))
 
 (defn deploy-to-mainnet []
   (mount/stop #'district.server.web3/web3
