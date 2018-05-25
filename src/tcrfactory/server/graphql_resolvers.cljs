@@ -32,11 +32,11 @@
            :where [:or
                    [:like (sql/call :upper :registries.registry/title) (str/upper-case (str "%" keyword "%"))]
                    [:like (sql/call :upper :registries.registry/description) (str/upper-case (str "%" keyword "%"))]]}))
-
+ 
 (def graphql-resolvers
 
   {:registry registry-resolver 
-   :search-registries search-registries-resolver }))
+   :search-registries search-registries-resolver })
 
 ;;;;;;;;;;;
 ;; Tests ;;
@@ -64,4 +64,3 @@
                           :registry/description]]]})
 
   )
-======= end
