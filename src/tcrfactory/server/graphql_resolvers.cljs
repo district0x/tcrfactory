@@ -40,11 +40,12 @@
                            :from [:reg-entries]
                            :where [:= registry :reg-entries.reg-entry/registry]})
         now (last-block-timestamp)]
-    (reduce (fn [m reg-entry]
+    (reduce (fn [m {:keys [:challenge/votes-for :challenge/votes-against] :as reg-entry}]
               (log/info status (look (reg-entry-status now reg-entry)))
               (if (= status (reg-entry-status now reg-entry))
                 (conj m (merge reg-entry
-                               {:reg-entry/status (enum status)}))
+                               {:reg-entry/status (enum status)
+                                :challenge/votes-total (+ votes-for votes-against)}))
                 m))
             []
             sql-query)))
@@ -64,7 +65,7 @@
            :where [:or
                    [:like (sql/call :upper :registries.registry/title) (str/upper-case (str "%" keyword "%"))]
                    [:like (sql/call :upper :registries.registry/description) (str/upper-case (str "%" keyword "%"))]]}))
- 
+
 (def graphql-resolvers
   {:registry registry-resolver
    :search-registries search-registries-resolver})
