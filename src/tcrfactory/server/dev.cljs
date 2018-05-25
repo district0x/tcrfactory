@@ -1,29 +1,24 @@
 (ns tcrfactory.server.dev
-  (:require
-    [camel-snake-kebab.core :as cs :include-macros true]
-    [cljs-time.core :as t]
-    [cljs-web3.core :as web3]
-    [cljs.nodejs :as nodejs]
-    [cljs.pprint :as pprint]
-    [district.server.config :refer [config]]
-    [district.server.db :refer [db]]
-    [district.server.graphql :as graphql]
-    [district.server.logging :refer [logging]]
-    [district.server.middleware.logging :refer [logging-middlewares]]
-    [district.server.smart-contracts]
-    [district.server.web3 :refer [web3]]
-    [district.server.web3-watcher]
-    [goog.date.Date]
-    [graphql-query.core :refer [graphql-query]]
-    [mount.core :as mount]
-    [print.foo :include-macros true]
-    [tcrfactory.server.db]
-    [tcrfactory.server.deployer]
-    [tcrfactory.server.generator]
-    [tcrfactory.server.graphql-mock-root-value :refer [graphql-mock-root-value]]
-    [tcrfactory.server.syncer]
-    [tcrfactory.shared.graphql-schema :refer [graphql-schema]]
-    [tcrfactory.shared.smart-contracts]))
+  (:require [cljs-time.core :as t]
+            [cljs-web3.core :as web3]
+            [cljs.nodejs :as nodejs]
+            [cljs.pprint :as pprint :refer [print-table]]
+            [clojure.string :as str]
+            [district.server.db :as db]
+            [district.server.graphql :as graphql]
+            [district.server.middleware.logging :refer [logging-middlewares]]
+            district.server.smart-contracts
+            [district.server.web3 :refer [web3]]
+            [mount.core :as mount]
+            tcrfactory.server.db
+            tcrfactory.server.deployer
+            tcrfactory.server.generator
+            [tcrfactory.server.graphql-mock-root-value
+             :refer
+             [graphql-mock-root-value]]
+            tcrfactory.server.syncer
+            [tcrfactory.shared.graphql-schema :refer [graphql-schema]]
+            tcrfactory.shared.smart-contracts))
 
 (nodejs/enable-util-print!)
 
@@ -93,5 +88,22 @@
 (set! *main-cli-fn* -main)
 
 
+(defn select
+  "Usage: (select [:*] :from [:memes])"
+  [& [select-fields & r]]
+  (-> (db/all (->> (partition 2 r)
+                   (map vec)
+                   (into {:select select-fields})))
+      (print-table)))
+
+(defn print-db
+  "Prints all db tables to the repl"
+  []
+  (let [all-tables (->> (db/all {:select [:name] :from [:sqlite-master] :where [:= :type "table"]})
+                        (map :name))]
+    (doseq [t all-tables]
+      (println "#######" (str/upper-case t) "#######")
+      (select [:*] :from [(keyword t)])
+      (println "\n\n"))))
 
 
