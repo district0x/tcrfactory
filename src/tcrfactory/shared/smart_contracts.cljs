@@ -6,16 +6,16 @@
   :address "0x148b2fd1d764c72351e548eb602d26afc8dfcac2"},
  :minime-token-factory
  {:name "MiniMeTokenFactory",
-  :address "0x4da54bf45eb83b182164db8b86a26aa6ca067f3b"},
+  :address "0x0f420ee650495c11aa8d3f22405a4e3f87054f0f"},
  :registry-entry
  {:name "RegistryEntry",
-  :address "0x2f6de709e1c9449f167a04080d283571881d1208"},
+  :address "0x6fce11fc41519d6ba6b33baf13df7641cec78658"},
  :registry
  {:name "Registry",
-  :address "0x706d2804f490daf44a74bd71a8a0fd6a9a258bc7"},
+  :address "0xb1af3bc53c54ad32e3189389ca40fe294fcad89b"},
  :registry-factory
  {:name "RegistryFactory",
-  :address "0x24c42e6b9aa837cdd5f0ce36a6b0da671f1a851f"},
+  :address "0x6efa0b4fa27cc184854e6d35ec86cc2f74fbe760"},
  :registry-entry-factory
  {:name "RegistryEntryFactory",
   :address "0x0000000000000000000000000000000000000000"}})
