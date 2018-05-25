@@ -21,7 +21,6 @@
     ]])
 
 (defn registry-line [data]
-  ^{:key (:registry/address data)}
   [:div.line
    [:div.title
     (:registry/title data)]
@@ -41,9 +40,11 @@
         [:div
          (when (:search-registries registries)
            [:div.registries
-            (map (fn [line]
-                   [registry-line line])
-                 (:search-registries registries))
+            (doall
+             (map (fn [line]
+                    ^{:key (:registry/address line)}
+                    [registry-line line])
+                  (:search-registries registries)))
             ;; (str @registries)
             ])]))))
 
