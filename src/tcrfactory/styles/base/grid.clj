@@ -1,4 +1,4 @@
-(ns memefactory.styles.base.grid
+(ns tcrfactory.styles.base.grid
   (:require [garden.def :refer [defstyles]]
             [garden.stylesheet :refer [at-media]]
             [clojure.string :as s]

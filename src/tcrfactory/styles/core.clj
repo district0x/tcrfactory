@@ -1,9 +1,11 @@
-(ns memefactory.styles.core
+(ns tcrfactory.styles.core
   (:require [garden.def :refer [defstyles]]
             [garden.units :refer [px]]
-            [memefactory.styles.app-layout :as app-layout]
-            [memefactory.styles.app-menu :as app-menu]))
+            [tcrfactory.styles.app-layout :as app-layout]
+            [tcrfactory.styles.app-bar :as app-bar]
+            [tcrfactory.styles.app-menu :as app-menu]))
 
 (defstyles main
   app-layout/core
+  app-bar/core
   app-menu/core)

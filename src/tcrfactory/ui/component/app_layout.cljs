@@ -24,11 +24,11 @@
   (= a b))
 
 (defn app-menu [props active-page]
-  [:div.ui.link.list
+  [:div.app-menu
    (doall
     (for [{:keys [:text :route :href :class :children]} props]
       (let [href (or href (path-for route))]
-        [:div
+        [:div.node
          [:div.item
           {:class (concat [class] (when (current-page? active-page href)));; (conj [class] )
            }
@@ -43,17 +43,17 @@
         ]
     (fn [active-page]
       [:div.app-bar
-       [:div.left-section
+       [:div.menu-section
         ;; [active-account]
         [app-menu nav-menu-items-props @active-page]
         #_[:i.icon.hamburger
          {:on-click (fn [e]
                       (dispatch [:district0x.menu-drawer/set true])
                       (.stopPropagation e))}]]
-       [:div.middle-section
+       [:div.search-section
         ;; [app-bar-search]
         ]
-       [:div.right-section
+       [:div.addr-section
         {:on-click (fn []
                      (if (empty? @my-addresses)
                        (dispatch [:district0x.location/nav-to :route/how-it-works {}])

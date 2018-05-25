@@ -1,4 +1,4 @@
-(ns memefactory.styles.base.colors)
+(ns tcrfactory.styles.base.colors)
 
 (defn color [name]
   name)
