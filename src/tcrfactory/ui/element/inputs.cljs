@@ -59,10 +59,10 @@
                                     (get-by-path errors [:remote id]))]
                     (apply str e)))]
         [:div.input-group
-         {:class (when err :has-error)}
+         {:class (when err :error)}
          [cmp (assoc opts :on-change on-touched)]
          (when err
-           [:span.glyphicon.glyphicon-remove.form-control-feedback])
+           [:span.icon.error])
          [:span.help-block (if err
                              err
                              [:div {:dangerouslySetInnerHTML {:__html "&nbsp;"}}])]]))))
@@ -124,24 +124,24 @@
 (defn int-input* [{:keys [id form-data errors on-change attrs] :as opts}]
   (let [fallback (re-core/atom nil)]
     (fn [{:keys [id form-data errors on-change attrs] :as opts}]
-      [:input.form-control (merge
-                            {:type "text"
-                             :value (if-let [f @fallback]
-                                      f
-                                      (get-by-path @form-data id ""))
-                             :on-change #(let [v (-> % .-target .-value)]
-                                           (when-let [iv (and (re-matches #"^\d*$" v)
-                                                              (js/parseInt v))]
-                                             (if-not (js/isNaN iv)
-                                               (do
-                                                 (reset! fallback v)
-                                                 (when on-change
-                                                   (on-change iv))
-                                                 (swap! form-data assoc-by-path id iv))
-                                               (do
-                                                 (swap! form-data assoc-by-path id nil)
-                                                 (reset! fallback v)))))}
-                            attrs)])))
+      [:input (merge
+               {:type "text"
+                :value (if-let [f @fallback]
+                         f
+                         (get-by-path @form-data id ""))
+                :on-change #(let [v (-> % .-target .-value)]
+                              (when-let [iv (and (re-matches #"^\d*$" v)
+                                                 (js/parseInt v))]
+                                (if-not (js/isNaN iv)
+                                  (do
+                                    (reset! fallback v)
+                                    (when on-change
+                                      (on-change iv))
+                                    (swap! form-data assoc-by-path id iv))
+                                  (do
+                                    (swap! form-data assoc-by-path id nil)
+                                    (reset! fallback v)))))}
+               attrs)])))
 
 (defn int-input [{:keys [id form-data errors] :as opts}]
   [err-reported opts int-input*])
@@ -150,7 +150,6 @@
   (fn [{:keys [id form-data errors on-change attrs] :as opts}]
     [:input (merge
              {:type "checkbox"
-              :class "form-control"
               :checked (get-by-path @form-data id "")
               :on-change #(let [v (-> % .-target .-value)]
                             (swap! form-data update-by-path id not)
