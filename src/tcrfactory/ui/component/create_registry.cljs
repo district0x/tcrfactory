@@ -8,15 +8,15 @@
     [tcrfactory.ui.element.inputs :refer [text-input]]
     [tcrfactory.ui.component.app-layout :refer [app-layout]]))
 
-(defn create-registry []
-  (let [form-data (re/atom {})
-        errors (re/atom {})]
-    [:div.search-form
-     [text-input {:form-data form-data
-                  :errors errors
-                  :id :registry/title}]]))
+(defn create-registry-form [form-data errors]
+  [:div.search-form
+   [text-input {:form-data form-data
+                :errors errors
+                :id :registry/title}]])
 
 (defmethod page :route/create-registry []
-  (let [form ()])
-  [app-layout
-   [:div "Create Registry"]])
+  (let [form-data (re/atom {})
+        errors (re/atom {})]
+    [app-layout
+     [:div "Create Registry"]
+     [create-registry-form form-data errors]]))

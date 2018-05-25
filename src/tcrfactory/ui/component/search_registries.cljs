@@ -30,12 +30,13 @@
 
 (defn registries-list [term]
   (let []
-    (fn [form-data]
+    (fn [term]
       (let [registries @(subscribe [::gql/query {:queries [[:search-registries
                                                            {:keyword term}
                                                            [:registry/title
                                                             :registry/description
                                                             :registry/address]]]}])]
+        (println term)
         (println registries)
         [:div
          (when (:search-registries registries)
