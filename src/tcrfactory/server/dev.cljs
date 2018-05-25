@@ -1,29 +1,26 @@
 (ns tcrfactory.server.dev
-  (:require
-    [camel-snake-kebab.core :as cs :include-macros true]
-    [cljs-time.core :as t]
-    [cljs-web3.core :as web3]
-    [cljs.nodejs :as nodejs]
-    [cljs.pprint :as pprint]
-    [district.server.config :refer [config]]
-    [district.server.db :refer [db]]
-    [district.server.graphql :as graphql]
-    [district.server.logging :refer [logging]]
-    [district.server.middleware.logging :refer [logging-middlewares]]
-    [district.server.smart-contracts]
-    [district.server.web3 :refer [web3]]
-    [district.server.web3-watcher]
-    [goog.date.Date]
-    [graphql-query.core :refer [graphql-query]]
-    [mount.core :as mount]
-    [print.foo :include-macros true]
-    [tcrfactory.server.db]
-    [tcrfactory.server.deployer]
-    [tcrfactory.server.generator]
-    [tcrfactory.server.graphql-mock-root-value :refer [graphql-mock-root-value]]
-    [tcrfactory.server.syncer]
-    [tcrfactory.shared.graphql-schema :refer [graphql-schema]]
-    [tcrfactory.shared.smart-contracts]))
+  (:require [cljs-time.core :as t]
+            [cljs-web3.core :as web3]
+            [cljs.nodejs :as nodejs]
+            [cljs.pprint :as pprint :refer [print-table]]
+            [clojure.string :as str]
+            [district.server.db :as db]
+            [district.server.graphql :as graphql]
+            [district.server.middleware.logging :refer [logging-middlewares]]
+            district.server.smart-contracts
+            [district.server.web3 :refer [web3]]
+            [mount.core :as mount]
+            tcrfactory.server.db
+            tcrfactory.server.deployer
+            tcrfactory.server.generator
+            [tcrfactory.server.graphql-mock-root-value
+             :refer
+             [graphql-mock-root-value]]
+            tcrfactory.server.syncer
+            [tcrfactory.server.graphql-resolvers :refer [graphql-resolvers]]
+            [tcrfactory.shared.graphql-schema :refer [graphql-schema]]
+            tcrfactory.shared.smart-contracts))
+
 
 (nodejs/enable-util-print!)
 
@@ -39,10 +36,10 @@
   (mount/stop #'district.server.web3/web3
               #'district.server.smart-contracts/smart-contracts)
   (mount/start-with-args (merge
-                           (mount/args)
-                           {:web3 {:port 8545}
-                            :deployer {:write? true
-                                       :gas-price (web3/to-wei 4 :gwei)}})
+                          (mount/args)
+                          {:web3 {:port 8545}
+                           :deployer {:write? true
+                                      :gas-price (web3/to-wei 4 :gwei)}})
                          #'district.server.web3/web3
                          #'district.server.smart-contracts/smart-contracts))
 
@@ -51,10 +48,10 @@
   (mount/stop)
   (-> (mount/with-args
         (merge
-          (mount/args)
-          {:deployer {:write? true}}))
-    (mount/start)
-    pprint/pprint))
+         (mount/args)
+         {:deployer {:write? true}}))
+      (mount/start)
+      pprint/pprint))
 
 
 (defn resync []
@@ -62,7 +59,7 @@
                    #'tcrfactory.server.syncer/syncer)
   (-> (mount.core/start #'tcrfactory.server.db/tcrfactory-db
                         #'tcrfactory.server.syncer/syncer)
-    pprint/pprint))
+      pprint/pprint))
 
 (defn -main [& _]
   (-> (mount/with-args
@@ -71,7 +68,7 @@
                             :graphql {:port 6400
                                       :middlewares [logging-middlewares]
                                       :schema graphql-schema
-                                      :root-value graphql-mock-root-value
+                                      :root-value graphql-resolvers
                                       :path "/graphql"
                                       :graphiql true}
                             :web3 {:port 8549}
@@ -85,13 +82,27 @@
          :smart-contracts {:contracts-var #'tcrfactory.shared.smart-contracts/smart-contracts
                            :print-gas-usage? true
                            :auto-mining? true}})
-    (mount/except [#'tcrfactory.server.deployer/deployer
-                   #'tcrfactory.server.generator/generator])
-    (mount/start)
-    pprint/pprint))
+      (mount/except [#'tcrfactory.server.deployer/deployer
+                     #'tcrfactory.server.generator/generator])
+      (mount/start)
+      pprint/pprint))
 
 (set! *main-cli-fn* -main)
 
+(defn select
+  "Usage: (select [:*] :from [:memes])"
+  [& [select-fields & r]]
+  (-> (db/all (->> (partition 2 r)
+                   (map vec)
+                   (into {:select select-fields})))
+      (print-table)))
 
-
-
+(defn print-db
+  "Prints all db tables to the repl"
+  []
+  (let [all-tables (->> (db/all {:select [:name] :from [:sqlite-master] :where [:= :type "table"]})
+                        (map :name))]
+    (doseq [t all-tables]
+      (println "#######" (str/upper-case t) "#######")
+      (select [:*] :from [(keyword t)])
+      (println "\n\n"))))
