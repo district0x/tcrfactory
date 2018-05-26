@@ -17,6 +17,7 @@
    {:class class}
    [:span[:h4 label]]
    [:span text]])
+
 (defn registry-detail-header [{:keys [:registry/address]}]
   (let [result (:registry @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
                                                                [:registry/created-on
@@ -33,7 +34,7 @@
                  [:token-symbol "Symbol" (:registry/token-symbol result)]
                  [:total-supply "Supply" (:registry/token-total-supply result)]
                  [:token "Token" (:registry/token result)]]]
-       [info-line line])]))
+       ^{:key (:registry/created-on result)} [info-line line])]))
 
 
 (defn challenge-form []
@@ -114,24 +115,25 @@
 (defmethod page :route/registry-detail []
   (let [page-params (subscribe [::router-subs/active-page-params])
         form-data (reagent/atom {:status :whitelist})]
-    [app-layout
-     [registry-detail-header {:registry/address (:registry-address @page-params)} ]
-     [:div
-      [:a.ui.button {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"] 
-      [select-input {:form-data form-data
-                     :id :status
-                     :options [{:key :whitelist :value "In Registry"}
-                               {:key :challenge-period :value "In Challenge Period"}
-                               {:key :commit-period :value "In Voting Period"}
-                               {:key :reveal-period :value "In Reveal Period"}]}]]
-     [registry-entries {:registry/status (get {:challenge-period :reg-entry.status/challenge-period
-                                               :commit-period :reg-entry.status/commit-period
-                                               :reveal-period :reg-entry.status/reveal-period
-                                               :whitelist :reg-entry.status/whitelisted}
-                                              (:status @form-data))
-                        :registry/address (:registry-address @page-params)}]
-     #_[:div [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
-            "Submit Entry"]]]))
+    (fn []
+      [app-layout
+       [registry-detail-header {:registry/address (:registry-address @page-params)} ]
+       [:div
+        [:a.ui.button {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]
+        [select-input {:form-data form-data
+                       :id :status
+                       :options [{:key :whitelist :value "In Registry"}
+                                 {:key :challenge-period :value "In Challenge Period"}
+                                 {:key :commit-period :value "In Voting Period"}
+                                 {:key :reveal-period :value "In Reveal Period"}]}]]
+       [registry-entries {:registry/status (get {:challenge-period :reg-entry.status/challenge-period
+                                                 :commit-period :reg-entry.status/commit-period
+                                                 :reveal-period :reg-entry.status/reveal-period
+                                                 :whitelist :reg-entry.status/whitelisted}
+                                                (:status @form-data))
+                          :registry/address (:registry-address @page-params)}]
+       #_[:div [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
+                "Submit Entry"]]])))
 
 (defn create-registry-entry-body [{:keys [:registry/address]}]
   (let [form-data (reagent/atom {})
