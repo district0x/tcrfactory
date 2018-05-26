@@ -16,6 +16,7 @@
             [clojure.string :as str]
             [district.server.graphql :refer [run-query]]))
 
+
 (def enum graphql-utils/kw->gql-name)
 
 (def graphql-fields (nodejs/require "graphql-fields"))
@@ -68,7 +69,7 @@
   (log/info "registry resolver args" args)
   (let [fields (resolver-fields document)]
     (merge (db/get {:select (into [:registry/address]
-                                  (filter #(contains? (set meme-db/registries-column-names) %) fields)) #_[:*]
+                                  (filter #(contains? (set meme-db/registries-column-names) %) fields))
                     :from [:registries]
                     :where [:= address :registries.registry/address]})
            {:registry/entries (fn [{:keys [:status] :as args} context document]
@@ -93,6 +94,10 @@
 
 (comment
 
+  (run-query {:queries [[:search-registries {:keyword "movies"}
+                         [:registry/address
+                          :registry/title
+                          :registry/description]]]})
 
   (db/get {:select [:*]
                         :from [:registries]

@@ -2,7 +2,8 @@
   (:require
    [reagent.core :as r]
    [district.ui.router.utils :as router-utils]
-   [re-frame.core :refer [dispatch subscribe]]))
+   [re-frame.core :refer [dispatch subscribe]]
+   [tcrfactory.ui.utils :as utils]))
 
 (def nav-menu-items-props [{:text "Search Registry"
                             :route :route/search-registries
@@ -19,14 +20,11 @@
 (defn current-page? [a b]
   (= a b))
 
-(defn path [route]
-  (str "#" (router-utils/resolve route)))
-
 (defn menu [props active-page]
   [:div.app-menu
    (doall
     (for [{:keys [:text :route :href :class :children]} props]
-      (let [href (or href (path route))]
+      (let [href (or href (utils/path route))]
         [:div.node
          [:div.item
           {:class (concat [class] (when (current-page? active-page href)));; (conj [class] )

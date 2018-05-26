@@ -26,6 +26,7 @@
     registry_tokenTotalSupply: String
     registry_tokenName: String
     registry_tokenSymbol: String
+    registry_createdOn: Date
     registry_challengePeriodDuration: Int
     registry_commitPeriodDuration: Int
     registry_revealPeriodDuration: Int

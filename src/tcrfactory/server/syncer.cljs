@@ -42,7 +42,8 @@
                             :registry/challenge-period-duration (bn/number challenge-period-duration)
                             :registry/commit-period-duration (bn/number commit-period-duration)
                             :registry/reveal-period-duration (bn/number reveal-period-duration)
-                            :registry/deposit (bn/number deposit)}))
+                            :registry/deposit (bn/number deposit)
+                            :registry/created-on (bn/number timestamp)})) 
     (catch :default e
       (error error-text {:args args :error (ex-message e)} ::on-registry-created))))
 
