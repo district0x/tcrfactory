@@ -16,8 +16,8 @@
 (defn create-registry-form-buttons [form-data errors]
   (if (empty? @errors)
     [:div.registry-form-buttons
-     [:button.ui.button {:type :button
-                         :on-click (partial create-registry @form-data)}
+     [:button.button.ui.right.floated {:type :button
+                                :on-click (partial create-registry @form-data)}
       "Create!"]]
     [:div (str "Errors: " @errors)]))
 
