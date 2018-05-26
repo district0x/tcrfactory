@@ -6,10 +6,10 @@
 
 (def nav-menu-items-props [{:text "Search Registry"
                             :route :route/search-registries
-                            :class :marketplace}
+                            :class :search-registry}
                            {:text "Create Registry"
                             :route :route/create-registry
-                            :class :dankregistry
+                            :class :create-registry
                             ;; :children [{:text "Submit"
                             ;;             :route :route.marketplace/index}
                             ;;            {:text "Vote"

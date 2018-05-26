@@ -1,13 +1,3 @@
 /*******************************
-         Site Variables
+         Site Overrides
 *******************************/
-
-@borderRadius: @segmentBorderRadius;
-@boxShadow: @floatingShadow;
-@headerBorder: none;
-@headerFontWeight: normal;
-@headerColor: @textColor;
-@headerFontSize: @h1;
-@actionBorder: none;
-@actionBackground: @brownBackground url(../images/namebazaar-pattern.png) no-repeat top center;
-@actionAlign: center;

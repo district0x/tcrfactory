@@ -1,5 +1,3 @@
 /*******************************
     User Variable Overrides
 *******************************/
-
-@subHeadingColor: @grey;

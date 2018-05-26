@@ -14,8 +14,8 @@
     :background (color "white")}
    [:.node
     {:border "1px"
-     :border-color (color "gray")
-     :border-style "dotted"}
+     :border-color (color :light-grey)
+     :border-style "solid"}
 
     [:.item
      {:display :flex
@@ -24,12 +24,15 @@
       :padding-bottom menu-gutter}
      [:&:before
       {:font-family "Icons"
+       :font-size "2em"
        :display :block
        :height (px 40)
        :width (px 40)
-       :float :left
-       :color (color "green")}]
-     [:&.dankregistry:before
-      {:content "\"\\f0c2\""}]
-     [:&.marketplace:before
-      {:content "\"\\f2a3\""}]]]])
+       :text-align :center
+       :vertical-align :middle
+       :line-height "1.4em"
+       :color (color "grey")}]
+     [:&.search-registry:before
+      {:content "\"\\f002\""}]"\f002"
+     [:&.create-registry:before
+      {:content "\"\\f044\""}]]]])

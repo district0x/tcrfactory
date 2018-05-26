@@ -1,11 +1,3 @@
 /*******************************
     User Variable Overrides
 *******************************/
-
-@borderRadius: 99px;
-@fontWeight: 400;
-@invertedTextColor: @whiteTextColor;
-@medium: @small;
-@primaryTextColor: @textColor;
-@small: 12px;
-@labeledIconBackgroundColor: transparent;

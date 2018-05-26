@@ -1,7 +1,3 @@
 /*******************************
          Site Overrides
 *******************************/
-
-.ui.modal > .actions {
-  background-size: cover;
-}

@@ -19,5 +19,5 @@
    [:h1 {:text-align "center"}]
    [:.app-menu
     {:justify-content :space-between}
-    [:.node {:border-width (px 3)}]]]
+    [:.node {:border-width (px 1)}]]]
   )
