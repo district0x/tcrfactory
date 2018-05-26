@@ -118,7 +118,7 @@
                                    :preloads [print.foo.preloads.devtools
                                               day8.re-frame-10x.preload]
                                    :closure-defines {goog.DEBUG true
-                                                     "re_frame.trace.trace_enabled_QMARK_" true}
+                                                     "re_frame.trace.trace_enabled_QMARK_" false}
                                    :external-config {:devtools/config {:features-to-install :all}}}}
                        {:id "dev-server"
                         :source-paths ["src/tcrfactory/server" "src/tcrfactory/shared"]
