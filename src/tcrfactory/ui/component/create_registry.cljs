@@ -10,6 +10,17 @@
 
 (def default-reg {:registry/token-name "TNAME",:registry/title "RTITE", :registry/challenge-period-duration 5555, :registry/deposit 444, :registry/token-symbol "TSYM", :registry/total-supply 2222222, :registry/reveal-period-duration 777777, :registry/commit-period-duration 6666, :registry/description "TDESC"})
 
+(defn create-registry [form-data _]
+  (dispatch [:create-registry form-data]))
+
+(defn create-registry-form-buttons [form-data errors]
+  (if (empty? @errors)
+    [:div.registry-form-buttons
+     [:button.ui.button {:type :button
+                         :on-click (partial create-registry @form-data)}
+      "Create!"]]
+    [:div (str "Errors: " @errors)]))
+
 (defn create-registry-form [form-data errors]
   [:div.ui.fluid.form.registry-form
    [:div.field
@@ -59,7 +70,7 @@
      [int-input {:form-data form-data
                  :errors errors
                  :id :registry/reveal-period-duration}]]]
-   ])
+   [create-registry-form-buttons form-data errors]])
 (defn f []
   [:form {:class "ui form"}
    [:div {:class "field"}
@@ -74,23 +85,16 @@
      [:label "I agree to the Terms and Conditions"]]]
    [:button {:class "ui button", :type "submit"} "Submit"]]
   )
-(defn create-registry [form-data _]
-  (dispatch [:create-registry form-data]))
 
-(defn create-registry-form-buttons [form-data errors]
-  (if (empty? @errors)
-    [:div.registry-form-buttons
-     [:button.ui.button {:type :button
-                         :on-click (partial create-registry @form-data)}
-      "Create!"]]
-    [:div (str "Errors: " @errors)])
-  )
+
+
 (defmethod page :route/create-registry []
   (let [form-data (re/atom default-reg)
         errors (re/atom {})]
     (fn []
       [app-layout
-       [:h1 "Create Registry"]
-       ;; [f]
-       [create-registry-form form-data errors]
-       [create-registry-form-buttons form-data errors]])))
+       [:div.ui.segment
+        [:h1 "Create Registry"]
+        ;; [f]
+        [create-registry-form form-data errors]
+        ]])))

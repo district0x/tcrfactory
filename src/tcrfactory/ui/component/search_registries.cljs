@@ -59,6 +59,7 @@
         errors (re/atom {})]
     (fn []
       [app-layout
-       [:h1 (str "Search Registries: " (:term @form-data))]
-       [search-form form-data errors]
-       [registries-list (:term @form-data)]])))
+       [:div.ui.segment
+        [:h1 (str "Search Registries: " (:term @form-data))]
+        [search-form form-data errors]
+        [registries-list (:term @form-data)]]])))

@@ -49,4 +49,4 @@
     (fn [& children]
       [:div.app-container
        [app-bar active-page]
-       (into [:div.app-content] children)])))
+       (into [:div.ui.container.app-content] children)])))
