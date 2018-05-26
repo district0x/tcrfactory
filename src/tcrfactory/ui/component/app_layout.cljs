@@ -47,6 +47,6 @@
         drawer-open? (r/atom true);;(subscribe [:district0x/menu-drawer-open?])
         ]
     (fn [& children]
-      [:div
+      [:div.app-container
        [app-bar active-page]
        (into [:div.app-content] children)])))
