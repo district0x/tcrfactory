@@ -91,31 +91,30 @@
 
 (defn registry-entries [{:keys [:registry/status :registry/address]}]
   (let [registry (-> @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
-                                                           [:registry/deposit
-                                                            :registry/token
-                                                            [:registry/entries {:status status}
-                                                             [:reg-entry/address
-                                                              :reg-entry/title
-                                                              :reg-entry/description
-                                                              :reg-entry/status]]]]]}])
-                      :registry)
+                                                          [:registry/deposit
+                                                           :registry/token
+                                                           [:registry/entries {:status status}
+                                                            [:reg-entry/address
+                                                             :reg-entry/title
+                                                             :reg-entry/description
+                                                             :reg-entry/status]]]]]}])
+                     :registry)
         {:keys [:registry/deposit :registry/entries :registry/token]} registry]
     [:div
      [:h3 "Entries"]
-     (for [entry entries]
-       [:div.reg-entry {:key (:reg-entry/address entry)
-                        :style {:border "1px solid grey"}}
-        [:div.title (:reg-entry/title entry)]
-        [:div.description (:reg-entry/description entry)]
-        (when-let [status (:reg-entry/status entry)]
-         (case (graphql-utils/gql-name->kw status)
-           :reg-entry.status/challenge-period [challenge-form {:registry/entry entry
-                                                               :registry/token token
-                                                               :registry/deposit deposit}]
-           :reg-entry.status/commit-period [vote-form {:registry/entry entry
-                                                       :registry/token token}]
-           :reg-entry.status/reveal-period [reveal-form {:registry/entry entry}]
-           nil))])]))
+     (for [{:keys [:reg-entry/address] :as entry} entries]
+       ^{:key address} [:div.reg-entry {:style {:border "1px solid grey"}}
+                        [:div.title (:reg-entry/title entry)]
+                        [:div.description (:reg-entry/description entry)]
+                        (when-let [status (:reg-entry/status entry)]
+                          (case (graphql-utils/gql-name->kw status)
+                            :reg-entry.status/challenge-period [challenge-form {:registry/entry entry
+                                                                                :registry/token token
+                                                                                :registry/deposit deposit}]
+                            :reg-entry.status/commit-period [vote-form {:registry/entry entry
+                                                                        :registry/token token}]
+                            :reg-entry.status/reveal-period [reveal-form {:registry/entry entry}]
+                            nil))])]))
 
 (defmethod page :route/registry-detail []
   (let [page-params (subscribe [::router-subs/active-page-params])
@@ -130,7 +129,7 @@
        [registry-detail-header {:registry/address (:registry-address @page-params)} ]
        [:div
         ;; TODO
-        [:div (str "SELECTED STATUS " @form-data)]
+        #_[:div (str "SELECTED STATUS " @form-data)]
         [:a.ui.button {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]
         [select-input {:form-data form-data
                        :id :status
