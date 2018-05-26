@@ -16,8 +16,6 @@
                  [district0x/district-format "1.0.0"]
                  [district0x/district-graphql-utils "1.0.5"]
                  [district0x/district-server-db "1.0.1"]
-                 #_[district0x/district-server-graphql "1.0.12"]
-                 #_[district0x/district-ui-graphql "1.0.0"]
                  [district0x/district-server-graphql "1.0.14"]
                  [district0x/district-ui-graphql "1.0.2"]
                  [district0x/district-server-logging "1.0.1"]

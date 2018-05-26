@@ -52,10 +52,10 @@
              [text-input {:form-data form-data
                           :id :challenge/description}]]
 
-            [:button {:on-click #(dispatch [:create-challenge (look {:registry-entry address
-                                                                :registry-token token
-                                                                :deposit deposit
-                                                                :description (:challenge/description @form-data)})])}
+            [:button {:on-click #(dispatch [:create-challenge {:registry-entry address
+                                                               :registry-token token
+                                                               :deposit deposit
+                                                               :description (:challenge/description @form-data)}])}
              "Submit challenge"]]
            ;; when it's close
            [:button.challenge {:on-click #(reset! open? true)} ">>"])]))))
@@ -86,10 +86,13 @@
      "Reveal"]]))
 
 (defn registry-entries [{:keys [:registry/status :registry/address]}]
-  (let [registry (-> @(subscribe [::gql/query {:queries [[:registry {:registry/address (look address)}
+
+(prn "@registry-entries" status)
+
+  (let [registry (-> @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
                                                            [:registry/deposit
                                                             :registry/token
-                                                            [:registry/entries {:status #_"regEntry_status_challengePeriod" (look status)}
+                                                            [:registry/entries {:status status}
                                                              [:reg-entry/address
                                                               :reg-entry/title
                                                               :reg-entry/description
@@ -114,24 +117,21 @@
 
 (defmethod page :route/registry-detail []
   (let [page-params (subscribe [::router-subs/active-page-params])
-        form-data (reagent/atom {:status "whitelist"})]
+        form-data (reagent/atom {:status "regEntry_status_whitelisted"})]
     (fn []
       [app-layout
        [registry-detail-header {:registry/address (:registry-address @page-params)} ]
        [:div
-        [:div (str "HERE " @form-data)]
+        ;; TODO
+        [:div (str "SELECTED STATUS " @form-data)]
         [:a.ui.button {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]
         [select-input {:form-data form-data
                        :id :status
-                       :options [{:key "whitelist" :value "In Registry"}
-                                 {:key "challenge-period" :value "In Challenge Period"}
-                                 {:key "commit-period" :value "In Voting Period"}
-                                 {:key "reveal-period" :value "In Reveal Period"}]}]]
-       [registry-entries {:registry/status (get {"challenge-period" :reg-entry.status/challenge-period
-                                                 "commit-period" :reg-entry.status/commit-period
-                                                 "reveal-period" :reg-entry.status/reveal-period
-                                                 "whitelist" :reg-entry.status/whitelisted}
-                                                (:status @form-data))
+                       :options [{:key "regEntry_status_whitelisted" :value "In Registry"}
+                                 {:key "regEntry_status_challengePeriod" :value "In Challenge Period"}
+                                 {:key "regEntry_status_commitPeriod" :value "In Voting Period"}
+                                 {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}]}]]
+       [registry-entries {:registry/status (:status @form-data)
                           :registry/address (:registry-address @page-params)}]
        #_[:div [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
                 "Submit Entry"]]])))
@@ -168,10 +168,10 @@
 
 (comment
 
-@(subscribe [::gql/query {:queries [[:registry {:registry/address "0x733c88400438c8e71942f53dfb86d5c82a333b70"}
+@(subscribe [::gql/query {:queries [[:registry {:registry/address "0xae5354a23f499fbef180e6bdede13648e65dab34"}
                                                            [:registry/deposit
                                                             :registry/token
-                                                            [:registry/entries {:status :reg-entry.status/whitelisted #_"regEntry_status_challengePeriod"}
+                                                            [:registry/entries {:status "regEntry_status_whitelisted"}
                                                              [:reg-entry/address
                                                               :reg-entry/title
                                                               :reg-entry/description

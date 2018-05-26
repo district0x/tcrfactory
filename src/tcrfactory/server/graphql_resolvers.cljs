@@ -10,7 +10,6 @@
             [cljs-web3.core :as web3-core]
             [cljs.pprint :as pprint]
             [cljs-web3.eth :as web3-eth]
-            [print.foo :include-macros true :refer [look]]
             [taoensso.timbre :as log]
             [tcrfactory.server.db :as meme-db]
             [print.foo :include-macros true :refer [look]]
@@ -37,14 +36,14 @@
 (defn reg-entry-status [now {:keys [:reg-entry/created-on :reg-entry/challenge-period-end :challenge/challenger
                                     :challenge/commit-period-end :challenge/commit-period-end
                                     :challenge/reveal-period-end :challenge/votes-for :challenge/votes-against] :as args}]
-  
+
   (cond
-    (and (< now challenge-period-end) (not challenger)) :reg-entry.status/challenge-period
-    (< now commit-period-end)                           :reg-entry.status/commit-period
-    (< now reveal-period-end)                           :reg-entry.status/reveal-period
+    (and (< now challenge-period-end) (not challenger)) "regEntry_status_challengePeriod" #_:reg-entry.status/challenge-period
+    (< now commit-period-end)                           "regEntry_status_commitPeriod" #_:reg-entry.status/commit-period
+    (< now reveal-period-end)                           "regEntry_status_revealPeriod" #_:reg-entry.status/reveal-period
     (or (< votes-against votes-for)
-        (< challenge-period-end now))                   :reg-entry.status/whitelisted
-    :else                                               :reg-entry.status/blacklisted))
+        (< challenge-period-end now))                   "regEntry_status_whitelisted" #_:reg-entry.status/whitelisted
+    :else                                               "regEntry_status_blacklisted" #_:reg-entry.status/blacklisted))
 
 (defn registry-entries-resolver [{:keys [:reg-entry/registry :reg-entry/status] :as args} context document]
   (log/info "registry-entries resolver args" args)
@@ -58,9 +57,7 @@
                            :from [:reg-entries]
                            :where [:= registry :reg-entries.reg-entry/registry]})
         now (last-block-timestamp)]
-    (log/info "registry-entries fields" (look fields))
     (reduce (fn [m {:keys [:challenge/votes-for :challenge/votes-against] :as reg-entry}]
-              (log/info status (reg-entry-status now reg-entry))
               (if (= status (reg-entry-status now reg-entry))
                 (conj m (merge reg-entry
                                (when (contains? fields :reg-entry/status) {:reg-entry/status (enum status)})
@@ -70,7 +67,7 @@
             sql-query)))
 
 (defn registry-resolver [{:keys [:registry/address] :as args} context document]
-  (log/info "registry resolver args" args)
+  (log/debug "registry resolver args" args)
   (let [fields (resolver-fields document)]
     (merge (db/get {:select (into [:registry/address]
                                   (filter #(contains? (set meme-db/registries-column-names) %) fields))
@@ -78,7 +75,7 @@
                     :where [:= address :registries.registry/address]})
            {:registry/entries (fn [{:keys [:status] :as args} context document]
                                 (registry-entries-resolver {:reg-entry/registry address
-                                                            :reg-entry/status (when status (graphql-utils/gql-name->kw status))} context document))})))
+                                                            :reg-entry/status (name status) #_(when status (graphql-utils/gql-name->kw status))} context document))})))
 
 (defn search-registries-resolver [{:keys [keyword] :as args} context document]
   (log/info ":registry " args)

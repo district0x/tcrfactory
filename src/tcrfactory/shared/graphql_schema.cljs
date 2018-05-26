@@ -9,6 +9,8 @@
     searchRegistries(keyword: String): [Registry]
   }
 
+
+
   enum RegEntryStatus {
     regEntry_status_challengePeriod
     regEntry_status_commitPeriod
@@ -32,7 +34,7 @@
     registry_commitPeriodDuration: Int
     registry_revealPeriodDuration: Int
     registry_deposit: Float
-    registry_entries(status: RegEntryStatus): [RegEntry]
+    registry_entries(status: Keyword): [RegEntry]
   }
 
   type RegEntry {
@@ -40,7 +42,7 @@
     regEntry_version: Int
     regEntry_title: String
     regEntry_description: String
-    regEntry_status: RegEntryStatus
+    regEntry_status: Keyword
     regEntry_creator: String
     regEntry_deposit: Int
     regEntry_createdOn: Date
