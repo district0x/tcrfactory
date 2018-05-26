@@ -9,8 +9,7 @@
    [district.ui.web3-sync-now.events :as sync-now-events]
    [district.ui.web3-tx.events :as tx-events]
    [re-frame.core :as re-frame :refer [reg-event-fx reg-event-db trim-v console dispatch]]
-   [tcrfactory.shared.contract.registry-entry :refer [vote-option->num]]
-   [tcrfactory.server.contract.registry :as registry]))
+   [tcrfactory.shared.contract.registry-entry :refer [vote-option->num]]))
 
 (def interceptors [trim-v])
 
@@ -192,9 +191,9 @@
                                        :tx-opts {:from (accounts-q/active-account db)
                                                  :gas 3000000}
                                        :on-tx-success [:commit-vote-success {:vote-option vote-option
-                                                                             :account (accounts-q/active-account db) 
+                                                                             :account (accounts-q/active-account db)
                                                                              :reg-entry/address (look registry-entry)}]
-                                       :on-tx-hash-error [:commit-vote-error] 
+                                       :on-tx-hash-error [:commit-vote-error]
                                        :on-tx-error [:commit-vote-error]}]})))
 
 
@@ -246,7 +245,7 @@
     nil))
 
 (reg-event-db
-  :set-current-status 
+  :set-current-status
   interceptors
   (fn [db [status]]
     (assoc db :current-status status)))
