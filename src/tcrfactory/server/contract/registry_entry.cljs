@@ -17,6 +17,10 @@
   [contract-addr]
   (parse-status (contract-call [:registry-entry contract-addr] :status)))
 
+(defn get-now
+  [contract-addr]
+  (contract-call [:registry-entry contract-addr] :get-now))
+
 (defn load-registry-entry [contract-addr]
   (parse-load-registry-entry
     contract-addr

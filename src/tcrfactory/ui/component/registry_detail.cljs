@@ -1,6 +1,10 @@
 (ns tcrfactory.ui.component.registry-detail
   (:require [district.ui.component.page :refer [page]]
             [district.ui.graphql.subs :as gql]
+            [district.ui.web3-sync-now.events :as sync-now-events]
+            [cljs-web3.evm :as web3-evm]
+            [cljs-web3.core :as web3]
+            [district.ui.web3.queries :refer [web3]]
             [graphql-query.core :as q]
             [district.ui.router.subs :as router-subs]
             [district.ui.router.utils :as router-utils]
@@ -61,8 +65,9 @@
            [:button.challenge {:on-click #(reset! open? true)} ">>"])]))))
 
 
-(defn vote-form [{:keys [:reg-entry/address :reg-entry/token]}]
+(defn vote-form [{:keys [:registry/entry :registry/token]}]
   (let [form-data (reagent/atom {})
+        {:keys [:reg-entry/address]} entry
         dispatch-commit-vote (fn [option]
                                (dispatch [:commit-vote {:registry-entry address
                                                         :registry-token token
@@ -74,13 +79,14 @@
     [:button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
     [:button {:on-click #(dispatch-commit-vote :vote.option/vote-against)} "Vote Against"]]))
 
-(defn reveal-form [{:keys [:reg-entry/address :reg-entry/token]}]
+(defn reveal-form [{:keys [:registry/entry]}]
   (let [active-account @(subscribe [::accounts-subs/active-account])
+        {:keys [:reg-entry/address]} entry
         vote-option @(subscribe [:vote-option {:reg-entry/address address
-                                                 :account active-account}])]
+                                               :account active-account}])]
 
    [:div.reveal-form
-    [:button {:on-click #(dispatch [:reveal-vote {:registry-entry address
+    [:button {:on-click #(dispatch [:reveal-vote {:registry-entry entry
                                                   :vote-option vote-option
                                                   :salt "a"}])}
      "Reveal"]]))
@@ -111,8 +117,9 @@
            :reg-entry.status/challenge-period [challenge-form {:registry/entry entry
                                                                :registry/token token
                                                                :registry/deposit deposit}]
-           :reg-entry.status/commit-period [vote-form]
-           :reg-entry.status/reveal-period [reveal-form]
+           :reg-entry.status/commit-period [vote-form {:registry/entry entry
+                                                       :registry/token token}]
+           :reg-entry.status/reveal-period [reveal-form {:registry/entry entry}]
            nil))])]))
 
 (defmethod page :route/registry-detail []
@@ -120,6 +127,11 @@
         form-data (reagent/atom {:status "regEntry_status_whitelisted"})]
     (fn []
       [app-layout
+       [:button {:on-click #(do
+                              (dispatch [::sync-now-events/increment-now 350])
+                              (web3-evm/mine! (web3 @re-frame.db/app-db) (fn [])))}
+        "Increase blockchain time by 350"]
+
        [registry-detail-header {:registry/address (:registry-address @page-params)} ]
        [:div
         ;; TODO
@@ -133,8 +145,8 @@
                                  {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}]}]]
        [registry-entries {:registry/status (:status @form-data)
                           :registry/address (:registry-address @page-params)}]
-       #_[:div [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
-                "Submit Entry"]]])))
+       [:div [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
+              "Submit Entry"]]])))
 
 (defn create-registry-entry-body [{:keys [:registry/address]}]
   (let [form-data (reagent/atom {})
@@ -144,15 +156,17 @@
                                                     :registry/entry-factory]]]}])]
     (fn [{:keys [:registry/address]}]
       (let [{:keys [:registry/deposit :registry/token :registry/entry-factory]} (:registry @result)]
-        [:div
+        [:div.ui.segment
          [:h2 "New item"]
          [:div.ui.form
-          [with-label
-           "Title"
-           [text-input {:form-data form-data :id :title}]]
-          [with-label
-           "Description"
-           [text-input {:form-data form-data :id :description}]]
+          [:div.field
+           [with-label
+            "Title"
+            [text-input {:form-data form-data :id :title}]]]
+          [:div.field
+           [with-label
+            "Description"
+            [text-input {:form-data form-data :id :description}]]]
           [:div.ui.button {:on-click #(dispatch [:create-registry-entry (look {:registry-entry-factory entry-factory
                                                                                :registry-token token
                                                                                :deposit deposit

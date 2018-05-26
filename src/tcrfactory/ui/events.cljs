@@ -2,14 +2,15 @@
   (:require
    [cljs-solidity-sha3.core :refer [solidity-sha3]]
    [print.foo :include-macros true :refer [look]]
-    [cljs-web3.core :as web3]
-    [cljs-web3.eth :as web3-eth]
-    [district.ui.smart-contracts.queries :as contract-q]
-    [district.ui.web3-accounts.queries :as accounts-q]
-    [district.ui.web3-sync-now.events :as sync-now-events]
-    [district.ui.web3-tx.events :as tx-events]
-    [re-frame.core :as re-frame :refer [reg-event-fx reg-event-db trim-v console dispatch]]
-    [tcrfactory.shared.contract.registry-entry :refer [vote-option->num]]))
+   [cljs-web3.core :as web3]
+   [cljs-web3.eth :as web3-eth]
+   [district.ui.smart-contracts.queries :as contract-q]
+   [district.ui.web3-accounts.queries :as accounts-q]
+   [district.ui.web3-sync-now.events :as sync-now-events]
+   [district.ui.web3-tx.events :as tx-events]
+   [re-frame.core :as re-frame :refer [reg-event-fx reg-event-db trim-v console dispatch]]
+   [tcrfactory.shared.contract.registry-entry :refer [vote-option->num]]
+   [tcrfactory.server.contract.registry :as registry]))
 
 (def interceptors [trim-v])
 
@@ -191,8 +192,9 @@
                                        :tx-opts {:from (accounts-q/active-account db)
                                                  :gas 3000000}
                                        :on-tx-success [:commit-vote-success {:vote-option vote-option
-                                                                             :account (accounts-q/active-account db)}]
-                                       :on-tx-hash-error [:commit-vote-error]
+                                                                             :account (accounts-q/active-account db) 
+                                                                             :reg-entry/address (look registry-entry)}]
+                                       :on-tx-hash-error [:commit-vote-error] 
                                        :on-tx-error [:commit-vote-error]}]})))
 
 
@@ -215,8 +217,9 @@
 (reg-event-fx
   :reveal-vote
   interceptors
-  (fn [{:keys [db]} [{:keys [:registry-entry :vote-option :salt]}]]
-    {:dispatch [::tx-events/send-tx {:instance (contract-q/instance db :registry-entry registry-entry)
+  (fn [{:keys [db]} [{:keys [:registry-entry :vote-option :salt] :as args}]]
+    (look args)
+    {:dispatch [::tx-events/send-tx {:instance (contract-q/instance db :registry-entry (:reg-entry/address registry-entry))
                                      :fn :reveal-vote
                                      :args [(vote-option->num vote-option)
                                             salt]

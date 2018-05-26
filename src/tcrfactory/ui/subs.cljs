@@ -3,7 +3,7 @@
 
 (re-frame/reg-sub
  :vote-option
- (fn [db {:keys [:reg-entry/address :account]}]
+ (fn [db [_ {:keys [:reg-entry/address :account]}]]
    (get-in db [:vote-options account address])))
 
 (re-frame/reg-sub
