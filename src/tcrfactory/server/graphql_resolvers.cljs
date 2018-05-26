@@ -1,22 +1,17 @@
 (ns tcrfactory.server.graphql-resolvers
-  (:require [cljs.nodejs :as nodejs]
-            [cljs-time.core :as t]
+  (:require [bignumber.core :as bn]
             [cljs-time.coerce :as tcoerce]
-            [clojure.string :as string]
-            [district.server.db :as db]
-            [district.graphql-utils :as graphql-utils]
-            [honeysql.core :as sql]
-            [district.server.web3 :as web3]
-            [cljs-web3.core :as web3-core]
-            [cljs.pprint :as pprint]
-            [cljs-web3.eth :as web3-eth]
-            [print.foo :include-macros true :refer [look]]
-            [taoensso.timbre :as log]
-            [tcrfactory.server.db :as meme-db]
-            [print.foo :include-macros true :refer [look]]
+            [cljs-time.core :as t]
+            [cljs.nodejs :as nodejs]
             [clojure.string :as str]
-            [district.server.graphql :refer [run-query]]))
-
+            [district.graphql-utils :as graphql-utils]
+            [district.server.db :as db]
+            [district.server.graphql :refer [run-query]]
+            [honeysql.core :as sql]
+            [print.foo :refer [look] :include-macros true]
+            [taoensso.timbre :as log]
+            [tcrfactory.server.contract.registry-entry :as sre]
+            [tcrfactory.server.db :as meme-db]))
 
 (def enum graphql-utils/kw->gql-name)
 
@@ -34,17 +29,21 @@
               (map graphql-utils/gql-name->kw)
               set))
 
-(defn reg-entry-status [now {:keys [:reg-entry/created-on :reg-entry/challenge-period-end :challenge/challenger
-                                    :challenge/commit-period-end :challenge/commit-period-end
-                                    :challenge/reveal-period-end :challenge/votes-for :challenge/votes-against] :as args}]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Not using this anymore  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; (defn reg-entry-status [now {:keys [:reg-entry/created-on :reg-entry/challenge-period-end :challenge/challenger
+;;                                     :challenge/commit-period-end :challenge/commit-period-end
+;;                                     :challenge/reveal-period-end :challenge/votes-for :challenge/votes-against] :as args}]
   
-  (cond
-    (and (< now challenge-period-end) (not challenger)) :reg-entry.status/challenge-period
-    (< now commit-period-end)                           :reg-entry.status/commit-period
-    (< now reveal-period-end)                           :reg-entry.status/reveal-period
-    (or (< votes-against votes-for)
-        (< challenge-period-end now))                   :reg-entry.status/whitelisted
-    :else                                               :reg-entry.status/blacklisted))
+;;   (cond
+;;     (and (< now challenge-period-end) (not challenger)) :reg-entry.status/challenge-period
+;;     (< now commit-period-end)                           :reg-entry.status/commit-period
+;;     (< now reveal-period-end)                           :reg-entry.status/reveal-period
+;;     (or (< votes-against votes-for)
+;;         (< challenge-period-end now))                   :reg-entry.status/whitelisted
+;;     :else                                               :reg-entry.status/blacklisted))
 
 (defn registry-entries-resolver [{:keys [:reg-entry/registry :reg-entry/status] :as args} context document]
   (log/info "registry-entries resolver args" args)
@@ -58,16 +57,17 @@
                            :from [:reg-entries]
                            :where [:= registry :reg-entries.reg-entry/registry]})
         now (last-block-timestamp)]
-    (log/info "registry-entries fields" (look fields))
+    (log/info "registry-entries fields" fields)
     (reduce (fn [m {:keys [:challenge/votes-for :challenge/votes-against] :as reg-entry}]
-              (log/info status (reg-entry-status now reg-entry))
-              (if (= status (reg-entry-status now reg-entry))
-                (conj m (merge reg-entry
-                               (when (contains? fields :reg-entry/status) {:reg-entry/status (enum status)})
-                               (when (contains? fields :reg-entry/status) {:challenge/votes-total (+ votes-for votes-against)})))
-                m))
+              (let [entry-status (sre/status (:reg-entry/address reg-entry))]
+                (log/info status entry-status)
+                (if (= status entry-status)
+                  (conj m (merge reg-entry
+                                 (when (contains? fields :reg-entry/status) {:reg-entry/status (enum status)})
+                                 (when (contains? fields :reg-entry/status) {:challenge/votes-total (+ votes-for votes-against)})))
+                  m)))
             []
-            sql-query)))
+            sql-query))) 
 
 (defn registry-resolver [{:keys [:registry/address] :as args} context document]
   (log/info "registry resolver args" args)
@@ -98,6 +98,15 @@
 
 (comment
 
+  (->> (db/all {:select [:*]
+                :from [:reg-entries]})
+       (map (fn [re]
+              {:title (:reg-entry/title re)
+               :blockchain-status (sre/status (:reg-entry/address re))
+               :server-status (reg-entry-status (last-block-timestamp) re)
+               :get-now (sre/get-now (:reg-entry/address re))
+               :latest-block-now (last-block-timestamp)})))
+  
   (run-query {:queries [[:search-registries {:keyword "movies"}
                          [:registry/address
                           :registry/title
@@ -121,4 +130,12 @@
                           :registry/title
                           :registry/description]]]})
 
+  (->> (db/all {:select [:*]
+                :from [:reg-entries]})
+       (map (fn [re]
+              {:title (:reg-entry/title re)
+               :blockchain-status (sre/status (:reg-entry/address re))
+               :server-status (reg-entry-status (last-block-timestamp) re)
+               :get-now (bn/number (sre/get-now (:reg-entry/address re)))
+               :latest-block-now (last-block-timestamp)})))
   )

@@ -1,6 +1,10 @@
 (ns tcrfactory.ui.component.registry-detail
   (:require [district.ui.component.page :refer [page]]
             [district.ui.graphql.subs :as gql]
+            [district.ui.web3-sync-now.events :as sync-now-events]
+            [cljs-web3.evm :as web3-evm]
+            [cljs-web3.core :as web3]
+            [district.ui.web3.queries :refer [web3]]
             [graphql-query.core :as q]
             [district.ui.router.subs :as router-subs]
             [district.ui.router.utils :as router-utils]
@@ -56,9 +60,9 @@
                                                                :registry-token token
                                                                :deposit deposit
                                                                :description (:challenge/description @form-data)}])}
-             "Submit challenge"]
-            ;; when it's close
-            [:button.challenge {:on-click #(reset! open? true)} ">>"]])]))))
+             "Submit challenge"]]
+           ;; when it's close
+           [:button.challenge {:on-click #(reset! open? true)} ">>"])]))))
 
 
 (defn vote-form [{:keys [:registry/entry :registry/token]}]
@@ -120,9 +124,13 @@
         form-data (reagent/atom {:status "whitelist"})]
     (fn []
       [app-layout
+       [:button {:on-click #(do 
+                              (dispatch [::sync-now-events/increment-now 350])
+                              (web3-evm/mine! (web3 @re-frame.db/app-db) (fn [])))}
+        "Increase blockchain time by 350"]     
+
        [registry-detail-header {:registry/address (:registry-address @page-params)} ]
        [:div
-        [:div (str "HERE " @form-data)]
         [:a.ui.button {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]
         [select-input {:form-data form-data
                        :id :status
@@ -137,7 +145,7 @@
                                                 (:status @form-data))
                           :registry/address (:registry-address @page-params)}]
        [:div [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
-              "Submit Entry"]]])))
+	                "Submit Entry"]]])))
 
 (defn create-registry-entry-body [{:keys [:registry/address]}]
   (let [form-data (reagent/atom {})
