@@ -189,7 +189,8 @@
                                               extra-data]
                                        :tx-opts {:from (accounts-q/active-account db)
                                                  :gas 3000000}
-                                       :on-tx-success [:commit-vote-success]
+                                       :on-tx-success [:commit-vote-success {:vote-option vote-option
+                                                                             :account (accounts-q/active-account db)}]
                                        :on-tx-hash-error [:commit-vote-error]
                                        :on-tx-error [:commit-vote-error]}]})))
 
@@ -197,9 +198,9 @@
 (reg-event-fx
   :commit-vote-success
   interceptors
-  (fn [{:keys [db]} args]
+  (fn [{:keys [db]} [{:keys [vote-option account :reg-entry/address] :as args}]]
     (console :log :commit-vote-success args)
-    nil))
+    {:db (assoc-in db [:vote-options account address] vote-option)}))
 
 
 (reg-event-fx

@@ -20,7 +20,7 @@
 (def registries-columns
   [[:registry/address address primary-key not-nil]
    [:registry/title :varchar default-nil]
-   [:registry/description :varchar default-nil]
+   [:registry/description :varchar default-nil]   
    [:registry/db address not-nil]
    [:registry/token address not-nil]
    [:registry/token-total-supply :BIG :INT default-nil]
@@ -29,6 +29,7 @@
    [:registry/challenge-period-duration :unsigned :integer default-nil]
    [:registry/commit-period-duration :unsigned :integer default-nil]
    [:registry/reveal-period-duration :unsigned :integer default-nil]
+   [:registry/created-on :unsigned :integer not-nil]
    [:registry/deposit :unsigned :integer default-nil]])
 
 (def registry-entries-columns

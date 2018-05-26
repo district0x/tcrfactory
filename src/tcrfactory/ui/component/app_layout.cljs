@@ -32,7 +32,7 @@
         (if false;;(empty? @my-addresses)
           [:div "No Accounts"]
           [:div
-           [active-account-balance
+#_           [active-account-balance
             {:token :ETH
              :locale "en-US"
              :max-fraction-digits 3
@@ -46,10 +46,7 @@
   (let [active-page (r/atom nil);;(subscribe [:district0x/active-page])
         drawer-open? (r/atom true);;(subscribe [:district0x/menu-drawer-open?])
         ]
-    [:div
-     [app-bar active-page]
-     [:div.app-content]
-     (vec
-      (concat
-       [:div]
-       children))]))
+    (fn [& children]
+      [:div
+       [app-bar active-page]
+       (into [:div.app-content] children)])))

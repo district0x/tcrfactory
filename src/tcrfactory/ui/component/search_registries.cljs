@@ -2,6 +2,7 @@
   (:require
     [district.ui.component.page :refer [page]]
     [district.ui.graphql.subs :as gql]
+    [tcrfactory.ui.utils :as utils]
     [district.ui.router.utils :as router-utils]
     [re-frame.core :refer [subscribe]]
     [tcrfactory.ui.element.inputs :refer [text-input]]
@@ -10,7 +11,7 @@
 
 (defn search-form [form-data errors]
   [:div.search-form
-   [:label {:text "Repo:"}
+   [:label "Repo:"
     [text-input {:form-data form-data
                  :errors errors
                  :id :term}]
@@ -21,7 +22,7 @@
     ]])
 
 (defn registry-line [data]
-  [:div.line
+  [:a.line {:href (utils/path :route/registry-detail {:registry-address (:registry/address data)})}
    [:div.title
     (:registry/title data)]
    [:div.description

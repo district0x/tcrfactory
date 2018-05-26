@@ -27,7 +27,8 @@
     [tcrfactory.ui.component.home]
     [tcrfactory.ui.component.registry-detail]
     [tcrfactory.ui.component.search-registries]
-    [tcrfactory.ui.events]))
+    [tcrfactory.ui.events]
+    [tcrfactory.ui.subs]))
 
 (def debug? ^boolean js/goog.DEBUG)
 
