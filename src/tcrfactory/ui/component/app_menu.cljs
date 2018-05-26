@@ -7,30 +7,26 @@
 
 (def nav-menu-items-props [{:text "Search Registry"
                             :route :route/search-registries
+                            :icon :search
                             :class :search-registry}
                            {:text "Create Registry"
                             :route :route/create-registry
+                            :icon :edit
                             :class :create-registry
-                            ;; :children [{:text "Submit"
-                            ;;             :route :route.marketplace/index}
-                            ;;            {:text "Vote"
-                            ;;             :route :route.marketplace/index}]
                             }])
 
 (defn current-page? [a b]
   (= a b))
 
 (defn menu [props active-page]
-  [:div.app-menu
+  [:div.ui.two.item.menu;;app-menu
    (doall
-    (for [{:keys [:text :route :href :class :children]} props]
+    (for [{:keys [:icon :text :route :href :class :children]} props]
       (let [href (or href (utils/path route))]
-        [:div.node
-         [:div.item
-          {:class (concat [class] (when (current-page? active-page href)));; (conj [class] )
-           }
-          [:a {:href href} text]]
-         (when children
-           [menu children active-page])])))])
+        [:div.item
+         {:class (concat [class] (when (current-page? active-page href)));; (conj [class] )
+          }
+         [:i.icon {:class icon}]
+         [:a {:href href} text]])))])
 
 (def main-menu (partial menu nav-menu-items-props))
