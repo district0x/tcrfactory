@@ -22,11 +22,13 @@
     ]])
 
 (defn registry-line [data]
-  [:a.line {:href (utils/path :route/registry-detail {:registry-address (:registry/address data)})}
-   [:div.title
-    (:registry/title data)]
-   [:div.description
-    (:registry/description data)]])
+  [:a.item.line {:href (utils/path :route/registry-detail {:registry-address (:registry/address data)})}
+   [:i.icon.newspaper]
+   [:div.content
+    [:div.header.title
+     (:registry/title data)]
+    [:div.description
+     (:registry/description data)]]])
 
 (defn registries-list [term]
   (let []
@@ -40,20 +42,23 @@
         (println registries)
         [:div
          (when (:search-registries registries)
-           [:div.registries
-            (doall
-             (map (fn [line]
-                    ^{:key (:registry/address line)}
-                    [registry-line line])
-                  (:search-registries registries)))
-            ;; (str @registries)
-            ])]))))
+
+           [:div
+            [:h2 "Results:"]
+            [:div.ui.list.registries
+             (doall
+              (map (fn [line]
+                     ^{:key (:registry/address line)}
+                     [registry-line line])
+                   (:search-registries registries)))
+             ;; (str @registries)
+             ]])]))))
 
 (defmethod page :route/search-registries []
   (let [form-data (re/atom {})
         errors (re/atom {})]
     (fn []
       [app-layout
-       [:div (str "Search Registries: " (:term @form-data))]
+       [:h1 (str "Search Registries: " (:term @form-data))]
        [search-form form-data errors]
        [registries-list (:term @form-data)]])))

@@ -90,7 +90,7 @@
         errors (re/atom {})]
     (fn []
       [app-layout
-       [:div "Create Registry"]
+       [:h1 "Create Registry"]
        ;; [f]
        [create-registry-form form-data errors]
        [create-registry-form-buttons form-data errors]])))
