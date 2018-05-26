@@ -1,6 +1,6 @@
 (ns tcrfactory.server.graphql-resolvers
   (:require [bignumber.core :as bn]
-            [cljs-time.coerce :as tcoerce]
+            [cljs-time.coerce :as time-coerce]
             [cljs-time.core :as t]
             [cljs.nodejs :as nodejs]
             [clojure.string :as str]
@@ -8,14 +8,11 @@
             [district.server.db :as db]
             [district.server.graphql :refer [run-query]]
             [honeysql.core :as sql]
-<<<<<<< HEAD
             [district.server.web3 :as web3]
             [cljs-web3.core :as web3-core]
             [cljs.pprint :as pprint]
             [cljs-web3.eth :as web3-eth]
-=======
             [print.foo :refer [look] :include-macros true]
->>>>>>> 40efc076e862a0a973284f85cf26a3fedd16f122
             [taoensso.timbre :as log]
             [tcrfactory.server.contract.registry-entry :as sre]
             [tcrfactory.server.db :as meme-db]))
@@ -25,7 +22,7 @@
 (def graphql-fields (nodejs/require "graphql-fields"))
 
 (defn- last-block-timestamp []
-  (tcoerce/to-epoch (t/now)))
+  (time-coerce/to-epoch (t/now)))
 
 (defn- resolver-fields
   "Returns the first order fields"
@@ -35,6 +32,7 @@
               keys
               (map graphql-utils/gql-name->kw)
               set))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Not using this anymore  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -83,7 +81,8 @@
                     :where [:= address :registries.registry/address]})
            {:registry/entries (fn [{:keys [:status] :as args} context document]
                                 (registry-entries-resolver {:reg-entry/registry address
-                                                            :reg-entry/status (name status) #_(when status (graphql-utils/gql-name->kw status))} context document))})))
+                                                            :reg-entry/status #_(name status) (when status (graphql-utils/gql-name->kw status))}
+                                                           context document))})))
 
 (defn search-registries-resolver [{:keys [keyword] :as args} context document]
   (log/info ":registry " args)
