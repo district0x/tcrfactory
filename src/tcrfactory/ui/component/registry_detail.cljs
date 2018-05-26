@@ -144,15 +144,17 @@
                                                     :registry/entry-factory]]]}])]
     (fn [{:keys [:registry/address]}]
       (let [{:keys [:registry/deposit :registry/token :registry/entry-factory]} (:registry @result)]
-        [:div
+        [:div.ui.segment
          [:h2 "New item"]
          [:div.ui.form
-          [with-label
-           "Title"
-           [text-input {:form-data form-data :id :title}]]
-          [with-label
-           "Description"
-           [text-input {:form-data form-data :id :description}]]
+          [:div.field
+           [with-label
+            "Title"
+            [text-input {:form-data form-data :id :title}]]]
+          [:div.field
+           [with-label
+            "Description"
+            [text-input {:form-data form-data :id :description}]]]
           [:div.ui.button {:on-click #(dispatch [:create-registry-entry (look {:registry-entry-factory entry-factory
                                                                                :registry-token token
                                                                                :deposit deposit
