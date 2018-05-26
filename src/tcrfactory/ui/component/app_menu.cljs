@@ -19,14 +19,13 @@
   (= a b))
 
 (defn menu [props active-page]
-  [:div.ui.two.item.menu;;app-menu
+  [:div.ui.two.item.menu
    (doall
     (for [{:keys [:icon :text :route :href :class :children]} props]
       (let [href (or href (utils/path route))]
-        [:div.item
-         {:class (concat [class] (when (current-page? active-page href)));; (conj [class] )
-          }
-         [:i.icon {:class icon}]
-         [:a {:href href} text]])))])
+        ^{:key route} [:div.item
+                       {:class (concat [class] (when (current-page? active-page href)))}
+                       [:i.icon {:class icon}]
+                       [:a {:href href} text]])))])
 
 (def main-menu (partial menu nav-menu-items-props))
