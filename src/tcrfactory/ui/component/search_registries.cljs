@@ -10,7 +10,7 @@
     [tcrfactory.ui.component.app-layout :refer [app-layout]]))
 
 (defn search-form [form-data errors]
-  [:div.search-form
+  [:div.ui.form
    [:label "Repo:"
     [text-input {:form-data form-data
                  :errors errors

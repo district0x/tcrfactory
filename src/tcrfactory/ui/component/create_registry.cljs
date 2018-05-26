@@ -11,47 +11,69 @@
 (def default-reg {:registry/token-name "TNAME",:registry/title "RTITE", :registry/challenge-period-duration 5555, :registry/deposit 444, :registry/token-symbol "TSYM", :registry/total-supply 2222222, :registry/reveal-period-duration 777777, :registry/commit-period-duration 6666, :registry/description "TDESC"})
 
 (defn create-registry-form [form-data errors]
-  [:div.registry-form
-   [with-label "Title"
-    [text-input {:form-data form-data
+  [:div.ui.fluid.form.registry-form
+   [:div.field
+    [with-label "Title"
+     [text-input {:form-data form-data
 
+                  :errors errors
+                  :id :registry/title}]]]
+   [:div.field
+    [with-label "Token name"
+     [text-input {:form-data form-data
+                  :errors errors
+                  :id :registry/token-name}]]]
+   [:div.field
+    [with-label "Token description"
+     [text-input {:form-data form-data
+                  :input-type :textarea
+                  :errors errors
+                  :id :registry/description}]]]
+   [:div.field
+    [with-label "Token symbol"
+     [text-input {:form-data form-data
+                  :errors errors
+                  :id :registry/token-symbol}]]]
+   [:div.field
+    [with-label "Total supply, wei"
+     [int-input {:form-data form-data
                  :errors errors
-                 :id :registry/title}]]
-   [with-label "Token name"
-    [text-input {:form-data form-data
+                 :id :registry/total-supply}]]]
+   [:div.field
+    [with-label "Deposit amount, wei"
+     [int-input {:form-data form-data
                  :errors errors
-                 :id :registry/token-name}]]
-   [with-label "Token description"
-    [text-input {:form-data form-data
-                 :input-type :textarea
+                 :id :registry/deposit}]]]
+   [:div.field
+    [with-label "Challenge period duration, sec"
+     [int-input {:form-data form-data
                  :errors errors
-                 :id :registry/description}]]
-   [with-label "Token symbol"
-    [text-input {:form-data form-data
+                 :id :registry/challenge-period-duration}]]]
+   [:div.field
+    [with-label "Commit period duration, sec"
+     [int-input {:form-data form-data
                  :errors errors
-                 :id :registry/token-symbol}]]
-   [with-label "Total supply, wei"
-    [int-input {:form-data form-data
-                     :errors errors
-                     :id :registry/total-supply}]]
-   [with-label "Deposit amount, wei"
-    [int-input {:form-data form-data
-                     :errors errors
-                     :id :registry/deposit}]]
-   [with-label "Challenge period duration, sec"
-    [int-input {:form-data form-data
-                :errors errors
-                :id :registry/challenge-period-duration}]]
-   [with-label "Commit period duration, sec"
-    [int-input {:form-data form-data
-                :errors errors
-                :id :registry/commit-period-duration}]]
-   [with-label "Reveal period duration, sec"
-    [int-input {:form-data form-data
-                :errors errors
-                :id :registry/reveal-period-duration}]]
+                 :id :registry/commit-period-duration}]]]
+   [:div.field
+    [with-label "Reveal period duration, sec"
+     [int-input {:form-data form-data
+                 :errors errors
+                 :id :registry/reveal-period-duration}]]]
    ])
-
+(defn f []
+  [:form {:class "ui form"}
+   [:div {:class "field"}
+    [:label "First Name"]
+    [:input {:type "text", :name "first-name", :placeholder "First Name"}]]
+   [:div {:class "field"}
+    [:label "Last Name"]
+    [:input {:type "text", :name "last-name", :placeholder "Last Name"}]]
+   [:div {:class "field"}
+    [:div {:class "ui checkbox"}
+     [:input {:type "checkbox", :tabindex "0", :class "hidden"}]
+     [:label "I agree to the Terms and Conditions"]]]
+   [:button {:class "ui button", :type "submit"} "Submit"]]
+  )
 (defn create-registry [form-data _]
   (dispatch [:create-registry form-data]))
 
@@ -69,5 +91,6 @@
     (fn []
       [app-layout
        [:div "Create Registry"]
+       ;; [f]
        [create-registry-form form-data errors]
        [create-registry-form-buttons form-data errors]])))

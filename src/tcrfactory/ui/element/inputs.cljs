@@ -35,7 +35,7 @@
     (update-in doc n-path fn)))
 
 (defn with-label [label body]
-  [:div.labeled
+  [:div ;;.ui.labeled.input
    [:label label]
    body])
 
@@ -58,14 +58,8 @@
                   (when-let [e (and (not @touched?)
                                     (get-by-path errors [:remote id]))]
                     (apply str e)))]
-        [:div.input-group
-         {:class (when err :error)}
-         [cmp (assoc opts :on-change on-touched)]
-         (when err
-           [:span.icon.error])
-         [:span.help-block (if err
-                             err
-                             [:div {:dangerouslySetInnerHTML {:__html "&nbsp;"}}])]]))))
+        [cmp (assoc opts :on-change on-touched)]
+        ))))
 
 
 (defn text-input* [{:keys [id form-data errors on-change attrs input-type] :as opts}]
@@ -73,15 +67,14 @@
     (let [a (if (= input-type :textarea)
               :textarea
               :input)]
-      [:div
-       [a (merge
-           {:type "text"
-            :value (get-by-path @form-data id "")
-            :on-change #(let [v (-> % .-target .-value)]
-                          (swap! form-data assoc-by-path id v)
-                          (when on-change
-                            (on-change v)))}
-           attrs)]])))
+      [a (merge
+          {:type "text"
+           :value (get-by-path @form-data id "")
+           :on-change #(let [v (-> % .-target .-value)]
+                         (swap! form-data assoc-by-path id v)
+                         (when on-change
+                           (on-change v)))}
+          attrs)])))
 
 (defn text-input [opts]
   [err-reported opts text-input*])
