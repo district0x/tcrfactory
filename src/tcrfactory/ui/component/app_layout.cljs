@@ -29,14 +29,13 @@
                      (if (empty? @my-addresses)
                        (dispatch [:district0x.location/nav-to :route/how-it-works {}])
                        (dispatch [:district0x.transaction-log/set-open (not @open?)])))}
-        (if false;;(empty? @my-addresses)
-          [:div "No Accounts"]
-          [:div
-#_           [active-account-balance
-            {:token :ETH
-             :locale "en-US"
-             :max-fraction-digits 3
-             :min-fraction-digits 2}]])
+        [:div
+         [active-account]
+         #_           [active-account-balance
+                       {:token :ETH
+                        :locale "en-US"
+                        :max-fraction-digits 3
+                        :min-fraction-digits 2}]]
         [:i.icon.transactions]]])))
 
 

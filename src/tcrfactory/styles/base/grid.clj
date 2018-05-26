@@ -6,3 +6,6 @@
 
 (defn grid-columns [& columns]
   {:grid-template-columns (s/join " " (map str columns))})
+
+(defn grid-rows [& columns]
+  {:grid-template-rows (s/join " " (map str columns))})
