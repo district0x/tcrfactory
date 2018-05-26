@@ -9,6 +9,7 @@
 (defstyles core
   [:.menu-section
    [:.ui.menu {:border-bottom-width (px 0)
+               :width (px 400)
                :box-shadow :none}
     [:.ui.item {:border-bottom-width (px 0)}]]]
   [:.app-menu
