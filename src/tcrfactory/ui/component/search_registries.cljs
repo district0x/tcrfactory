@@ -11,15 +11,16 @@
 
 (defn search-form [form-data errors]
   [:div.ui.form
-   [:label "Repo:"
+   [:div.field
+    [:label "Keyword:"
+     
+     #_[:input {:type "text"
+                :on-change (fn [e]
+                             (let [value (aget e "target" "value")]
+                               (reset! term-atom value)))}]]
     [text-input {:form-data form-data
                  :errors errors
-                 :id :term}]
-    #_[:input {:type "text"
-             :on-change (fn [e]
-                          (let [value (aget e "target" "value")]
-                            (reset! term-atom value)))}]
-    ]])
+                 :id :term}]]])
 
 (defn registry-line [data]
   [:a.item.line {:href (utils/path :route/registry-detail {:registry-address (:registry/address data)})}
@@ -59,8 +60,7 @@
       [app-layout
        [:div
         [:div.ui.segment
-         [:div.ui.hidden.divider]
-         [:h1 (str "Search Registries: " (:term @form-data))]
+         [:h1 (str "Search Registries")]
          [:div.ui.hidden.divider]
          [search-form form-data errors]]
         [registries-list (:term @form-data)]

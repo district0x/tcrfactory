@@ -94,7 +94,6 @@
     (fn []
       [app-layout
        [:div.ui.segment
-        [:div.ui.hidden.divider]
         [:h1 "Create Registry"]
         ;; [f]
         [:div.ui.hidden.divider]

@@ -18,13 +18,14 @@
   [:.app-container
    {:display :grid
     :height "100%"}
-   (grid-rows "45px" "100%")
+   (grid-rows "45px")
    (grid-columns "10%" "80%" "10%")
    (for-media-max :mobile
                   [:&
                    (grid-columns "100%")])
    [:.app-content
     {:margin "3em"
+     :padding "2em"
      :box-shadow "0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)"
      :background-color (color :white)}]
    [:.app-bar
@@ -33,5 +34,6 @@
    [:.app-content
     {:grid-column "2 / span 1"}]
    [:.ui.segment
-    {:border-style :none}]
+    {:border-style :none
+     :box-shadow :none}]
    ])
