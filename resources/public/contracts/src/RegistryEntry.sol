@@ -150,6 +150,10 @@ contract RegistryEntry is ApproveAndCallFallBack {
     registry.fireRegistryEntryEvent("challengeCreated", version);
   }
 
+  function getNow() public constant returns(uint) {
+    return now;
+  }
+
   /**
    * @dev Commits encrypted vote to challenged entry
    * Locks voter's tokens in this contract. Returns when vote is revealed
@@ -495,4 +499,3 @@ contract RegistryEntry is ApproveAndCallFallBack {
     );
   }
 }
-
