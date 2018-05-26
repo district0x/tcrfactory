@@ -31,15 +31,13 @@
                                                                 :registry/token-total-supply
                                                                 :registry/token]]]}]))]
     [:div.ui.segment.registry-info
-
      [:h3 (:registry/title result)]
-     (for [line [[:created-on "Created On" (str (:registry/created-on result))]
-                 [:description "Description" (:registry/description result)]
-                 [:token-symbol "Symbol" (:registry/token-symbol result)]
-                 [:total-supply "Supply" (:registry/token-total-supply result)]
-                 [:token "Token" (:registry/token result)]]]
-       ^{:key (:registry/created-on result)} [info-line line])]))
-
+     (for [[index line] (map-indexed vector [[:created-on "Created On" (str (:registry/created-on result))]
+                                             [:description "Description" (:registry/description result)]
+                                             [:token-symbol "Symbol" (:registry/token-symbol result)]
+                                             [:total-supply "Supply" (:registry/token-total-supply result)]
+                                             [:token "Token" (:registry/token result)]])]
+       ^{:key index} [info-line line])]))
 
 (defn challenge-form []
   (let [open? (reagent/atom false)
@@ -92,9 +90,6 @@
      "Reveal"]]))
 
 (defn registry-entries [{:keys [:registry/status :registry/address]}]
-
-(prn "@registry-entries" status)
-
   (let [registry (-> @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
                                                            [:registry/deposit
                                                             :registry/token

@@ -9,8 +9,6 @@
     searchRegistries(keyword: String): [Registry]
   }
 
-
-
   enum RegEntryStatus {
     regEntry_status_challengePeriod
     regEntry_status_commitPeriod
