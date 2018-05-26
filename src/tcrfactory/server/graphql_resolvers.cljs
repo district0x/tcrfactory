@@ -1,6 +1,7 @@
 (ns tcrfactory.server.graphql-resolvers
   (:require [cljs.nodejs :as nodejs]
             [cljs-time.core :as t]
+            [cljs-time.coerce :as tcoerce]
             [clojure.string :as string]
             [district.server.db :as db]
             [district.graphql-utils :as graphql-utils]
@@ -22,7 +23,7 @@
 (def graphql-fields (nodejs/require "graphql-fields"))
 
 (defn- last-block-timestamp []
-  (->> (web3-eth/block-number @web3/web3) (web3-eth/get-block @web3/web3) :timestamp))
+  (tcoerce/to-epoch (t/now)))
 
 (defn- resolver-fields
   "Returns the first order fields"
@@ -35,8 +36,8 @@
 
 (defn reg-entry-status [now {:keys [:reg-entry/created-on :reg-entry/challenge-period-end :challenge/challenger
                                     :challenge/commit-period-end :challenge/commit-period-end
-                                    :challenge/reveal-period-end :challenge/votes-for :challenge/votes-against]}]
-
+                                    :challenge/reveal-period-end :challenge/votes-for :challenge/votes-against] :as args}]
+  
   (cond
     (and (< now challenge-period-end) (not challenger)) :reg-entry.status/challenge-period
     (< now commit-period-end)                           :reg-entry.status/commit-period
@@ -49,7 +50,10 @@
   (log/info "registry-entries resolver args" args)
   (let [fields (resolver-fields document)
         sql-query (db/all {:select (into [:challenge/votes-for
-                                          :challenge/votes-against]
+                                          :challenge/votes-against
+                                          :reg-entry/created-on :reg-entry/challenge-period-end :challenge/challenger
+                                          :challenge/commit-period-end :challenge/commit-period-end
+                                          :challenge/reveal-period-end]
                                          (filter #(contains? (set meme-db/registry-entries-column-names) %) fields))
                            :from [:reg-entries]
                            :where [:= registry :reg-entries.reg-entry/registry]})
@@ -74,7 +78,7 @@
                     :where [:= address :registries.registry/address]})
            {:registry/entries (fn [{:keys [:status] :as args} context document]
                                 (registry-entries-resolver {:reg-entry/registry address
-                                                            :reg-entry/status (graphql-utils/gql-name->kw status)} context document))})))
+                                                            :reg-entry/status (when status (graphql-utils/gql-name->kw status))} context document))})))
 
 (defn search-registries-resolver [{:keys [keyword] :as args} context document]
   (log/info ":registry " args)

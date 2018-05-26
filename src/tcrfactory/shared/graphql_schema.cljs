@@ -22,6 +22,7 @@
     registry_title: String
     registry_description: String
     registry_db: String
+    registry_entryFactory: String
     registry_token: String
     registry_tokenTotalSupply: String
     registry_tokenName: String

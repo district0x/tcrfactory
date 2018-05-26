@@ -42,6 +42,7 @@
                             :registry/challenge-period-duration (bn/number challenge-period-duration)
                             :registry/commit-period-duration (bn/number commit-period-duration)
                             :registry/reveal-period-duration (bn/number reveal-period-duration)
+                            :registry/entry-factory registry-entry-factory
                             :registry/deposit (bn/number deposit)
                             :registry/created-on (bn/number timestamp)})) 
     (catch :default e

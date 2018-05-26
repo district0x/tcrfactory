@@ -22,6 +22,7 @@
    [:registry/title :varchar default-nil]
    [:registry/description :varchar default-nil]   
    [:registry/db address not-nil]
+   [:registry/entry-factory address not-nil]
    [:registry/token address not-nil]
    [:registry/token-total-supply :BIG :INT default-nil]
    [:registry/token-name :varchar default-nil]

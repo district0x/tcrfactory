@@ -1,13 +1,14 @@
 (ns tcrfactory.ui.events
   (:require
-    [cljs-solidity-sha3.core :refer [solidity-sha3]]
+   [cljs-solidity-sha3.core :refer [solidity-sha3]]
+   [print.foo :include-macros true :refer [look]]
     [cljs-web3.core :as web3]
     [cljs-web3.eth :as web3-eth]
     [district.ui.smart-contracts.queries :as contract-q]
     [district.ui.web3-accounts.queries :as accounts-q]
     [district.ui.web3-sync-now.events :as sync-now-events]
     [district.ui.web3-tx.events :as tx-events]
-    [re-frame.core :as re-frame :refer [reg-event-fx trim-v console dispatch]]
+    [re-frame.core :as re-frame :refer [reg-event-fx reg-event-db trim-v console dispatch]]
     [tcrfactory.shared.contract.registry-entry :refer [vote-option->num]]))
 
 (def interceptors [trim-v])
@@ -23,14 +24,14 @@
                                :registry/reveal-period-duration 300
                                :registry/deposit (web3/to-wei 10 :ether)}])
 
-  (dispatch [:create-registry-entry {:registry-entry-factory "0x93b7e67938ffbbd430d2a9744f73b3be51bf203d"
-                                     :registry-token "0x1642d08eb9d06e8142a8ab1c20b6476acbb2b039"
+  (dispatch [:create-registry-entry {:registry-entry-factory "0x6c764f510fa08ae1f29336766fa835fbd2417a94"
+                                     :registry-token "0xb068ba48ade639b399c0b947206777f9707ec1f4"
                                      :deposit (web3/to-wei 10 :ether)
                                      :title "DNT"
                                      :description "A hodlable token"}])
 
-  (dispatch [:create-challenge {:registry-entry "0x8ce83cb07c9853d0e34d2f591d8b0511de79a54c"
-                                :registry-token "0x1642d08eb9d06e8142a8ab1c20b6476acbb2b039"
+  (dispatch [:create-challenge {:registry-entry "0x56460c732d129293f1496851930438a7f561737e"
+                                :registry-token "0xb068ba48ade639b399c0b947206777f9707ec1f4"
                                 :deposit (web3/to-wei 10 :ether)
                                 :description "This token no good"}])
 
@@ -107,8 +108,8 @@
     (let [extra-data (web3-eth/contract-get-data (contract-q/instance db :registry-entry-factory)
                                                  :create-registry-entry
                                                  (accounts-q/active-account db)
-                                                 title
-                                                 description)]
+                                             (look title)
+                                                 (look description))]
       {:dispatch [::tx-events/send-tx {:instance (contract-q/instance db :registry-token registry-token)
                                        :fn :approve-and-call
                                        :args [registry-entry-factory
@@ -147,9 +148,9 @@
                                                  description)]
       {:dispatch [::tx-events/send-tx {:instance (contract-q/instance db :registry-token registry-token)
                                        :fn :approve-and-call
-                                       :args [registry-entry
-                                              deposit
-                                              extra-data]
+                                       :args (look [registry-entry
+                                               deposit
+                                               extra-data])
                                        :tx-opts {:from (accounts-q/active-account db)
                                                  :gas 3000000}
                                        :on-tx-success [:create-challenge-success]
@@ -240,3 +241,9 @@
   (fn [{:keys [db]} args]
     (console :error :reveal-vote-error args)
     nil))
+
+(reg-event-db
+  :set-current-status 
+  interceptors
+  (fn [db [status]]
+    (assoc db :current-status status)))
