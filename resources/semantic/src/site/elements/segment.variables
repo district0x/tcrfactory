@@ -1,9 +1,3 @@
 /*******************************
     User Variable Overrides
 *******************************/
-
-@border: none;
-@boxShadow: @segmentBoxShadow;
-@borderRadius: @segmentBorderRadius;
-@padding: 0;
-@paddedSegmentPadding: @segmentGutter;
