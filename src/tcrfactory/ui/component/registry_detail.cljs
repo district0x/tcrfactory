@@ -44,35 +44,37 @@
              [text-input {:form-data form-data
                           :id :challenge/description}]]
 
-            [:button {:on-click #(dispatch [:create-challenge (look {:registry-entry address
-                                                                :registry-token token
-                                                                :deposit deposit
-                                                                :description (:challenge/description @form-data)})])}
-             "Submit challenge"]]
-           ;; when it's close
-           [:button.challenge {:on-click #(reset! open? true)} ">>"])]))))
+            [:button {:on-click #(dispatch [:create-challenge {:registry-entry address
+                                                               :registry-token token
+                                                               :deposit deposit
+                                                               :description (:challenge/description @form-data)}])}
+             "Submit challenge"]
+            ;; when it's close
+            [:button.challenge {:on-click #(reset! open? true)} ">>"]])]))))
 
 
-(defn vote-form [{:keys [:reg-entry/address :reg-entry/token]}]
+(defn vote-form [{:keys [:registry/entry :registry/token]}]
   (let [form-data (reagent/atom {})
+        {:keys [:reg-entry/address]} entry
         dispatch-commit-vote (fn [option]
                                (dispatch [:commit-vote {:registry-entry address
                                                         :registry-token token
                                                         :amount (:amount @form-data)
-                                                        :vote-option option
+                                                        :vote-option option 
                                                         :salt "a"}]))]
    [:div.vote-form
     [text-input {:form-data form-data :id :amount}]
     [:button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
     [:button {:on-click #(dispatch-commit-vote :vote.option/vote-against)} "Vote Against"]]))
 
-(defn reveal-form [{:keys [:reg-entry/address :reg-entry/token]}]
+(defn reveal-form [{:keys [:registry/entry]}]
   (let [active-account @(subscribe [::accounts-subs/active-account])
+        {:keys [:reg-entry/address]} entry
         vote-option @(subscribe [:vote-option {:reg-entry/address address
-                                                 :account active-account}])]
-
+                                               :account active-account}])]
+   
    [:div.reveal-form
-    [:button {:on-click #(dispatch [:reveal-vote {:registry-entry address
+    [:button {:on-click #(dispatch [:reveal-vote {:registry-entry entry
                                                   :vote-option vote-option
                                                   :salt "a"}])}
      "Reveal"]]))
@@ -99,31 +101,33 @@
            :reg-entry.status/challenge-period [challenge-form {:registry/entry entry
                                                                :registry/token token
                                                                :registry/deposit deposit}]
-           :reg-entry.status/commit-period [vote-form]
-           :reg-entry.status/reveal-period [reveal-form]
+           :reg-entry.status/commit-period [vote-form {:registry/entry entry
+                                                       :registry/token token}]
+           :reg-entry.status/reveal-period [reveal-form {:registry/entry entry}]
            nil))])]))
 
 (defmethod page :route/registry-detail []
   (let [page-params (subscribe [::router-subs/active-page-params])
         form-data (reagent/atom {:status :whitelist})]
-    [app-layout
-     [registry-detail-header {:registry/address (:registry-address @page-params)} ]
-     [:div
-      [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]
-      [select-input {:form-data form-data
-                     :id :status
-                     :options [{:key :whitelist :value "In Registry"}
-                               {:key :challenge-period :value "In Challenge Period"}
-                               {:key :commit-period :value "In Voting Period"}
-                               {:key :reveal-period :value "In Reveal Period"}]}]]
-     [registry-entries {:registry/status (get {:challenge-period :reg-entry.status/challenge-period
-                                               :commit-period :reg-entry.status/commit-period
-                                               :reveal-period :reg-entry.status/reveal-period
-                                               :whitelist :reg-entry.status/whitelisted}
-                                              (:status @form-data))
-                        :registry/address (:registry-address @page-params)}]
-     [:div [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
-            "Submit Entry"]]]))
+    (fn []
+     [app-layout
+      [registry-detail-header {:registry/address (:registry-address @page-params)} ]
+      [:div
+       [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]
+       [select-input {:form-data form-data
+                      :id :status
+                      :options [{:key :whitelist :value "In Registry"}
+                                {:key :challenge-period :value "In Challenge Period"}
+                                {:key :commit-period :value "In Voting Period"}
+                                {:key :reveal-period :value "In Reveal Period"}]}]]
+      [registry-entries {:registry/status (get {:challenge-period :reg-entry.status/challenge-period
+                                                :commit-period :reg-entry.status/commit-period
+                                                :reveal-period :reg-entry.status/reveal-period
+                                                :whitelist :reg-entry.status/whitelisted}
+                                               (keyword (:status @form-data)))
+                         :registry/address (:registry-address @page-params)}]
+      [:div [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
+             "Submit Entry"]]])))
 
 (defn create-registry-entry-body [{:keys [:registry/address]}]
   (let [form-data (reagent/atom {})
