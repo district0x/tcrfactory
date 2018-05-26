@@ -35,7 +35,7 @@
     (fn [{:keys [:registry/entry :registry/deposit :registry/token]}]
       (let [{:keys [:reg-entry/address]} entry]
         [:div.challenge-form
-         
+
          (if @open?
            ;; when it's open
            [:div
@@ -43,7 +43,7 @@
              "Challenge Reason"
              [text-input {:form-data form-data
                           :id :challenge/description}]]
-            
+
             [:button {:on-click #(dispatch [:create-challenge (look {:registry-entry address
                                                                 :registry-token token
                                                                 :deposit deposit
@@ -70,7 +70,7 @@
   (let [active-account @(subscribe [::accounts-subs/active-account])
         vote-option @(subscribe [:vote-option {:reg-entry/address address
                                                  :account active-account}])]
-    
+
    [:div.reveal-form
     [:button {:on-click #(dispatch [:reveal-vote {:registry-entry address
                                                   :vote-option vote-option
@@ -105,24 +105,22 @@
 
 (defmethod page :route/registry-detail []
   (let [page-params (subscribe [::router-subs/active-page-params])
-        form-data (reagent/atom {})
-        current-status (subscribe [:current-status])]
-    [app-layout 
+        form-data (reagent/atom {:status :whitelist})]
+    [app-layout
      [registry-detail-header {:registry/address (:registry-address @page-params)} ]
      [:div
-      [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"] 
+      [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]
       [select-input {:form-data form-data
                      :id :status
                      :options [{:key :whitelist :value "In Registry"}
                                {:key :challenge-period :value "In Challenge Period"}
                                {:key :commit-period :value "In Voting Period"}
-                               {:key :reveal-period :value "In Reveal Period"}]
-                     :on-change #(dispatch [:set-current-status %])}]]
+                               {:key :reveal-period :value "In Reveal Period"}]}]]
      [registry-entries {:registry/status (get {:challenge-period :reg-entry.status/challenge-period
                                                :commit-period :reg-entry.status/commit-period
                                                :reveal-period :reg-entry.status/reveal-period
                                                :whitelist :reg-entry.status/whitelisted}
-                                              (keyword @current-status)) 
+                                              (:status @form-data))
                         :registry/address (:registry-address @page-params)}]
      [:div [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
             "Submit Entry"]]]))
@@ -153,7 +151,7 @@
   (let [page-params (subscribe [::router-subs/active-page-params])]
     [app-layout
      [registry-detail-header {:registry/address (:registry-address @page-params)}]
-     [create-registry-entry-body {:registry/address (:registry-address @page-params)}]])) 
+     [create-registry-entry-body {:registry/address (:registry-address @page-params)}]]))
 
 (comment
 
