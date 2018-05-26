@@ -7,6 +7,10 @@
 
 (def menu-gutter (px 15))
 (defstyles core
+  [:.menu-section
+   [:.ui.menu {:border-bottom-width (px 0)
+               :box-shadow :none}
+    [:.ui.item {:border-bottom-width (px 0)}]]]
   [:.app-menu
    {:display :flex
     :align-items :center

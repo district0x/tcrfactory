@@ -42,9 +42,7 @@
         (println registries)
         [:div
          (when (:search-registries registries)
-
-           [:div
-            [:h2 "Results:"]
+           [:div.ui.segment
             [:div.ui.list.registries
              (doall
               (map (fn [line]
@@ -59,7 +57,11 @@
         errors (re/atom {})]
     (fn []
       [app-layout
-       [:div.ui.segment
-        [:h1 (str "Search Registries: " (:term @form-data))]
-        [search-form form-data errors]
-        [registries-list (:term @form-data)]]])))
+       [:div
+        [:div.ui.segment
+         [:div.ui.hidden.divider]
+         [:h1 (str "Search Registries: " (:term @form-data))]
+         [:div.ui.hidden.divider]
+         [search-form form-data errors]]
+        [registries-list (:term @form-data)]
+        ]])))

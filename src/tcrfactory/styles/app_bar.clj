@@ -7,5 +7,6 @@
 
 (defstyles core
   [:.app-bar
-   {:display :grid}
+   {:box-shadow "0 0 50px 20px rgba(0,0,0,.04)"
+    :display :grid}
    (grid-columns "60%" "20%" "20%")])
