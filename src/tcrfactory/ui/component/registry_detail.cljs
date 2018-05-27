@@ -27,6 +27,9 @@
 (def time-formatter (time-format/formatter "yyyy-MM-dd"))
 
 (defn format-date [date]
+
+  (prn "@formatter" date)
+
   (when date (time-format/unparse time-formatter date)))
 
 (defn registry-detail-header [{:keys [:registry/address]}]
