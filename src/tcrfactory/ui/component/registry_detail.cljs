@@ -102,11 +102,11 @@
         {:keys [:registry/deposit :registry/entries :registry/token]} registry]
     [:div
      [:h3 "Entries"]
-     (for [{:keys [:reg-entry/address] :as entry} entries]
+     (for [{:keys [:reg-entry/address :reg-entry/description reg-entry/status] :as entry} entries]
        ^{:key address} [:div.reg-entry {:style {:border "1px solid grey"}}
                         [:div.title (:reg-entry/title entry)]
-                        [:div.description (:reg-entry/description entry)]
-                        (when-let [status (:reg-entry/status entry)]
+                        [:div.description description]
+                        (when status
                           (case (graphql-utils/gql-name->kw status)
                             :reg-entry.status/challenge-period [challenge-form {:registry/entry entry
                                                                                 :registry/token token
