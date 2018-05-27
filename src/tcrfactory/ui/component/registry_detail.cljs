@@ -95,9 +95,7 @@
     [:button {:on-click #(dispatch [:reveal-vote {:registry-entry entry
                                                   :vote-option vote-option
                                                   :salt "a"}])}
-     "Reveal"]]))
-
-(defn entry-line [status token deposit entry]
+     "Reveal"]])) (defn entry-line [status token deposit entry]
   [:div.item.line.reg-entry {:key (:reg-entry/address entry)}
    [:i.icon.star]
    [:div.content
@@ -157,8 +155,7 @@
                                  {:key "regEntry_status_commitPeriod" :value "In Voting Period"}
                                  {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}]}]]
        [registry-entries {:registry/status (:status @form-data)
-                          :registry/address (:registry-address @page-params)}]
-       ])))
+                          :registry/address (:registry-address @page-params)}]])))
 
 (defn create-registry-entry-body [{:keys [:registry/address]}]
   (let [form-data (reagent/atom {})
