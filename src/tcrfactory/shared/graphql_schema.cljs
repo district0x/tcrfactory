@@ -33,6 +33,7 @@
     registry_revealPeriodDuration: Int
     registry_deposit: Float
     registry_entries(status: Keyword): [RegEntry]
+    registry_tokenBalance(account: String): Float
   }
 
   type RegEntry {

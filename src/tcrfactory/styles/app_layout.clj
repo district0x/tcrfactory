@@ -11,7 +11,7 @@
   [:body
    {:background-color (color :paper)}]
   [:.menu-section {}]
-  [:.fftime {:z-index 10}]
+  [:.fftime {:z-index 1}]
   [:.info-line {:display :flex}
    [:span {:padding "0.4em"}]]
   [:.addr-section

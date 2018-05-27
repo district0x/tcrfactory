@@ -19,37 +19,52 @@
             [cljs-time.core :as time]
             [district.graphql-utils :as graphql-utils]))
 
-(defn info-line [[class label text]]
+(defn info-line [[class label & children]]
   [:div.content.info-line
    {:class class}
    [:span [:div.ui.header label]]
-   [:span text]])
+   (into [:span] children)])
 
 (def time-formatter (time-format/formatter "yyyy-MM-dd"))
 
 (defn format-date [date]
   (when date (time-format/unparse (time-format/formatters :date) (time-coerce/from-long (* 1000 date)))))
 
-(defn registry-detail-header [{:keys [:registry/address]}]
-  (let [{:keys [:registry/created-on :registry/title
-                :registry/description
-                :registry/token-symbol
-                :registry/token-total-supply
-                :registry/token] :as result} (:registry @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
-                                                                                             [:registry/created-on
-                                                                                              :registry/title
-                                                                                              :registry/description
-                                                                                              :registry/token-symbol
-                                                                                              :registry/token-total-supply
-                                                                                              :registry/token]]]}]))]
-    [:div.ui.segment.registry-info
-     [:h1.ui.header title]
-     [:h3.ui.disabled.header description]
-     (for [[index line] (map-indexed vector [[:created-on "Created On" (format-date created-on)]
-                                             [:token-symbol "Symbol" token-symbol]
-                                             [:total-supply "Supply" (web3/from-wei token-total-supply :ether)]
-                                             [:token "Token" token]])]
-       ^{:key index} [info-line line])]))
+(defn registry-detail-header []
+  (let [active-account (subscribe [::accounts-subs/active-account])]
+    (fn [{:keys [:registry/address]}]
+      (let [{:keys [:registry/created-on :registry/title
+                    :registry/description
+                    :registry/token-symbol
+                    :registry/token-total-supply
+                    :registry/token-balance
+                    :registry/deposit
+                    :registry/token] :as result} (:registry @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
+                                                                                                 [:registry/created-on
+                                                                                                  :registry/title
+                                                                                                  :registry/description
+                                                                                                  :registry/token-symbol
+                                                                                                  :registry/token-total-supply
+                                                                                                  :registry/token
+                                                                                                  :registry/deposit
+                                                                                                  [:registry/token-balance {:account @active-account}]]]]}
+                                                                                     {:refetch-on #{:create-registry-entry-success
+                                                                                                    ::sync-now-events/set-now
+                                                                                                    :create-challenge-success
+                                                                                                    :commit-vote-success
+                                                                                                    :reveal-vote-success}}]))]
+        [:div.ui.segment.registry-info
+         [:h1.ui.header title]
+         [:h3.ui.disabled.header description]
+         (for [[index line] (map-indexed vector [[:created-on "Created On" (format-date created-on)]
+                                                 [:token "Token" token]
+                                                 [:total-supply "Total Supply" (web3/from-wei token-total-supply :ether) " " token-symbol]
+                                                 [:token-deposit "Deposit" (web3/from-wei deposit :ether) " " token-symbol]
+                                                 [:token-balance "Your Balance" (or (web3/from-wei token-balance :ether)
+                                                                                    0)
+                                                  " "
+                                                  token-symbol]])]
+           ^{:key index} [info-line line])]))))
 
 (defn challenge-form []
   (let [open? (reagent/atom false)
@@ -86,7 +101,7 @@
         dispatch-commit-vote (fn [option]
                                (dispatch [:commit-vote {:registry-entry address
                                                         :registry-token token
-                                                        :amount (:amount @form-data)
+                                                        :amount (web3/to-wei (:amount @form-data) :ether)
                                                         :vote-option option
                                                         :salt "a"}]))]
     (fn [{:keys [:registry/entry :registry/token]}]

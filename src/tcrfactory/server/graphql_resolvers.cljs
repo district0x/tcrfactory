@@ -16,10 +16,11 @@
             [print.foo :refer [look] :include-macros true]
             [taoensso.timbre :as log]
             [tcrfactory.server.contract.registry-entry :as sre]
-            [tcrfactory.server.db :as meme-db]))
+            [tcrfactory.server.db :as meme-db]
+            [tcrfactory.server.contract.registry-token :as registry-token]))
 
 (defn- to-millis [epoch]
-  (* 1000 date)
+  (* 1000 epoch)
   #_(time-format/unparse (time-format/formatters :date) (time-coerce/from-long epoch)))
 
 (def enum graphql-utils/kw->gql-name)
@@ -32,11 +33,11 @@
 (defn- resolver-fields
   "Returns the first order fields"
   [debug] (->> (-> debug
-                  graphql-fields
-                  js->clj)
-              keys
-              (map graphql-utils/gql-name->kw)
-              set))
+                 graphql-fields
+                 js->clj)
+            keys
+            (map graphql-utils/gql-name->kw)
+            set))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Not using this anymore  ;;
@@ -83,14 +84,18 @@
 (defn registry-resolver [{:keys [:registry/address] :as args} context document]
   (log/debug "registry resolver args" args)
   (let [fields (resolver-fields document)]
-    (merge (db/get {:select (into [:registry/address]
-                                  (filter #(contains? (set meme-db/registries-column-names) %) fields))
-                    :from [:registries]
-                    :where [:= address :registries.registry/address]})
-           {:registry/entries (fn [{:keys [:status] :as args} context document]
-                                (registry-entries-resolver {:reg-entry/registry address
-                                                            :reg-entry/status (when status (graphql-utils/gql-name->kw status))}
-                                                           context document))})))
+    (let [registry (db/get {:select (into [:registry/address]
+                                          (filter #(contains? (set meme-db/registries-column-names) %) fields))
+                            :from [:registries]
+                            :where [:= address :registries.registry/address]})]
+      (merge registry
+             {:registry/entries (fn [{:keys [:status] :as args} context document]
+                                  (registry-entries-resolver {:reg-entry/registry address
+                                                              :reg-entry/status (when status (graphql-utils/gql-name->kw status))}
+                                                             context document))
+              :registry/token-balance (fn [{:keys [:account]}]
+                                        (bn/number (registry-token/balance-of (:registry/token registry)
+                                                                              account)))}))))
 
 (defn search-registries-resolver [{:keys [keyword] :as args} context document]
   (log/debug "search-registry args" args)
@@ -114,12 +119,12 @@
 
   (->> (db/all {:select [:*]
                 :from [:reg-entries]})
-       (map (fn [re]
-              {:title (:reg-entry/title re)
-               :blockchain-status (sre/status (:reg-entry/address re))
-               :server-status (reg-entry-status (last-block-timestamp) re)
-               :get-now (sre/get-now (:reg-entry/address re))
-               :latest-block-now (last-block-timestamp)})))
+    (map (fn [re]
+           {:title (:reg-entry/title re)
+            :blockchain-status (sre/status (:reg-entry/address re))
+            :server-status (reg-entry-status (last-block-timestamp) re)
+            :get-now (sre/get-now (:reg-entry/address re))
+            :latest-block-now (last-block-timestamp)})))
 
   (run-query {:queries [[:search-registries {:keyword "movies"}
                          [:registry/address
@@ -127,7 +132,7 @@
                           :registry/description]]]})
 
   (db/get {:select [:*]
-                        :from [:registries]
+           :from [:registries]
            :where [:= "0x1024477d9d41bc2d4740b152f4f847b8f805cf3a" :registries.registry/address]})
 
   (run-query {:queries [[:registry {:registry/address "0x1024477d9d41bc2d4740b152f4f847b8f805cf3a"}
@@ -146,10 +151,10 @@
 
   (->> (db/all {:select [:*]
                 :from [:reg-entries]})
-       (map (fn [re]
-              {:title (:reg-entry/title re)
-               :blockchain-status (sre/status (:reg-entry/address re))
-               :server-status (reg-entry-status (last-block-timestamp) re)
-               :get-now (bn/number (sre/get-now (:reg-entry/address re)))
-               :latest-block-now (last-block-timestamp)})))
+    (map (fn [re]
+           {:title (:reg-entry/title re)
+            :blockchain-status (sre/status (:reg-entry/address re))
+            :server-status (reg-entry-status (last-block-timestamp) re)
+            :get-now (bn/number (sre/get-now (:reg-entry/address re)))
+            :latest-block-now (last-block-timestamp)})))
   )
