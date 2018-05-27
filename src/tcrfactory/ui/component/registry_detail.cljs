@@ -73,7 +73,9 @@
                                                                           :description (:challenge/description @form-data)}])}
               "Submit challenge"]]]
            ;; when it's close
-           [:button.ui.button.challenge {:on-click #(reset! open? true)} ">>"])]))))
+           [:button.mini.ui.labeled.icon.button.challenge {:on-click #(reset! open? true)}
+            [:i.icon.chevron.down]
+            "Challenge"])]))))
 
 
 (defn vote-form [{:keys [:registry/entry :registry/token]}]
@@ -142,7 +144,9 @@
                                                  :challenge/description
                                                  :reg-entry/description
                                                  :reg-entry/status]]]]]}
-                                  {:refetch-on #{:create-registry-entry-success}}])
+                                  {:refetch-on #{:create-registry-entry-success
+                                                 ::sync-now-events/set-now
+                                                 :create-challenge-success}}])
                      :registry)
         {:keys [:registry/deposit :registry/entries :registry/token]} registry]
     [:div.ui.segment
