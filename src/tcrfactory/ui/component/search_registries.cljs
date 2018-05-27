@@ -28,11 +28,13 @@
 
 (defn registries-list [term]
   (fn [term]
-    (let [{:keys [:search-registries] :as registries} @(subscribe [::gql/query {:queries [[:search-registries
-                                                                                           {:keyword term}
-                                                                                           [:registry/title
-                                                                                            :registry/description
-                                                                                            :registry/address]]]}])]
+    (let [{:keys [:search-registries] :as registries} @(subscribe [::gql/query
+                                                                   {:queries [[:search-registries
+                                                                               {:keyword term}
+                                                                               [:registry/title
+                                                                                :registry/description
+                                                                                :registry/address]]]}
+                                                                   {:refetch-on #{:create-registry-success}}])]
       [:div
        (when search-registries
          [:div.ui.segment

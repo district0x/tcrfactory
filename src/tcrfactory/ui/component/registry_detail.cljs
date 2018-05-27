@@ -132,15 +132,17 @@
         nil))]])
 
 (defn registry-entries [{:keys [:registry/status :registry/address]}]
-  (let [registry (-> @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
-                                                          [:registry/deposit
-                                                           :registry/token
-                                                           [:registry/entries {:status status}
-                                                            [:reg-entry/address
-                                                             :reg-entry/title
-                                                             :challenge/description
-                                                             :reg-entry/description
-                                                             :reg-entry/status]]]]]}])
+  (let [registry (-> @(subscribe [::gql/query
+                                  {:queries [[:registry {:registry/address address}
+                                              [:registry/deposit
+                                               :registry/token
+                                               [:registry/entries {:status status}
+                                                [:reg-entry/address
+                                                 :reg-entry/title
+                                                 :challenge/description
+                                                 :reg-entry/description
+                                                 :reg-entry/status]]]]]}
+                                  {:refetch-on #{:create-registry-entry-success}}])
                      :registry)
         {:keys [:registry/deposit :registry/entries :registry/token]} registry]
     [:div.ui.segment
@@ -197,7 +199,7 @@
                                                                (look {:registry-entry-factory entry-factory
                                                                       :registry-token token
                                                                       :deposit deposit
-                                                                      :address address
+                                                                      :registry-address address
                                                                       :title (:title @form-data)
                                                                       :description (:description @form-data)})])}
            "Submit"]]]))))
@@ -226,5 +228,6 @@
                                  [:reg-entry/address
                                   :reg-entry/title
                                   :reg-entry/description
-                                  :reg-entry/status]]]]]})
+                                  :reg-entry/status]]]]]
+                    })
   )

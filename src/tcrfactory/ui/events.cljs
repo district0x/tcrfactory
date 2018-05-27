@@ -91,7 +91,8 @@
   interceptors
   (fn [{:keys [db]} args]
     (console :log :create-registry-success args)
-    nil))
+    {:dispatch-later [{:ms 1000
+                       :dispatch [::router-events/navigate :route/search-registries]}]}))
 
 
 (reg-event-fx
@@ -108,7 +109,7 @@
   (fn [{:keys [db]} [{:keys [:registry-entry-factory :registry-token :deposit :title :description
                             :registry-address]}]]
 
-    (console :create-registry-entry registry-address)
+    (console :log :create-registry-entry registry-address)
     (let [extra-data (web3-eth/contract-get-data (contract-q/instance db :registry-entry-factory)
                                                  :create-registry-entry
                                                  (accounts-q/active-account db)
@@ -132,7 +133,8 @@
   interceptors
   (fn [{:keys [db]} [orig args]]
     (console :log :create-registry-entry-success orig args)
-    {:dispatch [::router-events/navigate :route/registry-detail orig]}))
+    {:dispatch-later [{:ms 400
+                       :dispatch [::router-events/navigate :route/registry-detail orig]}]}))
 
 
 (reg-event-fx
