@@ -122,7 +122,7 @@
     [:div.ui.segment
      [:h3 "Entries"]
      [:div.ui.list.entries
-      (for [entry entries]
+      (for [entry (filter :reg-entry/address entries)]
         [entry-line status token deposit entry])]]))
 
 (defmethod page :route/registry-detail []
