@@ -12,7 +12,7 @@
             [reagent.core :as reagent]
             [print.foo :include-macros true :refer [look]]
             [tcrfactory.ui.component.app-layout :refer [app-layout]]
-            [tcrfactory.ui.element.inputs :refer [text-input select-input with-label]]
+            [tcrfactory.ui.element.inputs :refer [text-input int-input select-input with-label]]
             [district.ui.web3-accounts.subs :as accounts-subs]
             [district.graphql-utils :as graphql-utils]))
 
@@ -48,19 +48,21 @@
 
          (if @open?
            ;; when it's open
-           [:div
-            [with-label
-             "Challenge Reason"
-             [text-input {:form-data form-data
-                          :id :challenge/description}]]
+           [:div.ui.segment
+            [:div.ui.form
+             [:div.ui.field
+              [with-label
+               "Challenge Reason"
+               [text-input {:form-data form-data
+                            :id :challenge/description}]]]
 
-            [:button {:on-click #(dispatch [:create-challenge {:registry-entry address
-                                                               :registry-token token
-                                                               :deposit deposit
-                                                               :description (:challenge/description @form-data)}])}
-             "Submit challenge"]]
+             [:button.ui.button {:on-click #(dispatch [:create-challenge {:registry-entry address
+                                                                :registry-token token
+                                                                :deposit deposit
+                                                                :description (:challenge/description @form-data)}])}
+              "Submit challenge"]]]
            ;; when it's close
-           [:button.challenge {:on-click #(reset! open? true)} ">>"])]))))
+           [:button.ui.button.challenge {:on-click #(reset! open? true)} ">>"])]))))
 
 
 (defn vote-form [{:keys [:registry/entry :registry/token]}]
@@ -73,10 +75,13 @@
                                                         :vote-option option
                                                         :salt "a"}]))]
     (fn [{:keys [:registry/entry :registry/token]}]
-     [:div.vote-form
-      [text-input {:form-data form-data :id :amount}]
-      [:button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
-      [:button {:on-click #(dispatch-commit-vote :vote.option/vote-against)} "Vote Against"]])))
+     [:div.ui.form.vote-form
+      [:div.ui.field
+       [int-input {:form-data form-data :id :amount}]
+       [:div.ui.buttons
+        [:button.ui.positive.button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
+        [:div.or]
+        [:button.ui.button {:on-click #(dispatch-commit-vote :vote.option/vote-against)} "Vote Against"]]]])))
 
 (defn reveal-form [{:keys [:registry/entry]}]
   (let [active-account @(subscribe [::accounts-subs/active-account])
@@ -88,14 +93,16 @@
     [:button {:on-click #(dispatch [:reveal-vote {:registry-entry entry
                                                   :vote-option vote-option
                                                   :salt "a"}])}
-     "Reveal"]]))
-
-(defn entry-line [status token deposit entry]
+     "Reveal"]])) (defn entry-line [status token deposit entry]
   [:div.item.line.reg-entry {:key (:reg-entry/address entry)}
    [:i.icon.star]
    [:div.content
     [:div.header.title (:reg-entry/title entry)]
     [:div.description (:reg-entry/description entry)]
+    (when-let [challenge-desc (:challenge/description entry)]
+      [:div.description.challenge
+       [:i.icon.balance.scale]
+       challenge-desc])
     (when status
       (case (graphql-utils/gql-name->kw status)
         :reg-entry.status/challenge-period [challenge-form {:registry/entry entry
@@ -113,6 +120,7 @@
                                                            [:registry/entries {:status status}
                                                             [:reg-entry/address
                                                              :reg-entry/title
+                                                             :challenge/description
                                                              :reg-entry/description
                                                              :reg-entry/status]]]]]}])
                      :registry)
@@ -145,9 +153,7 @@
                                  {:key "regEntry_status_commitPeriod" :value "In Voting Period"}
                                  {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}]}]]
        [registry-entries {:registry/status (:status @form-data)
-                          :registry/address (:registry-address @page-params)}]
-       [:div [:a {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
-              "Submit Entry"]]])))
+                          :registry/address (:registry-address @page-params)}]])))
 
 (defn create-registry-entry-body [{:keys [:registry/address]}]
   (let [form-data (reagent/atom {})

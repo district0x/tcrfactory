@@ -90,7 +90,7 @@
 
           (registry-token/batch-transfer registry-token
                                          {:to (remove #(= tcr-creator %) accounts)
-                                          :amount (* (bn/number deposit) 3)}
+                                          :amount (* (bn/number deposit) 5)}
                                          {:from tcr-creator})
 
           (doseq [{:keys [:from-n :title :description :challenge]} entries]

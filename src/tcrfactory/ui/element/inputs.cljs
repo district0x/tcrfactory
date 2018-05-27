@@ -88,7 +88,7 @@
 
 (defn select-input* [{:keys [id form-data errors on-change attrs options] :as opts}]
   (fn [{:keys [id form-data errors on-change attrs options] :as opts}]
-    [:select.ui.input
+    [:select.ui.dropdown
      (merge attrs
             {:on-change (fn [item]
                           (let [val (.-target.value item)
