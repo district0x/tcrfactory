@@ -91,13 +91,13 @@
                                                   :salt "a"}])}
      "Reveal"]]))
 
-(defn entry-line [token deposit entry]
+(defn entry-line [status token deposit entry]
   [:div.item.line.reg-entry {:key (:reg-entry/address entry)}
    [:i.icon.star]
    [:div.content
     [:div.header.title (:reg-entry/title entry)]
     [:div.description (:reg-entry/description entry)]
-    (when-let [status (:reg-entry/status entry)]
+    (when status
       (case (graphql-utils/gql-name->kw status)
         :reg-entry.status/challenge-period [challenge-form {:registry/entry entry
                                                             :registry/token token
@@ -109,20 +109,20 @@
 
 (defn registry-entries [{:keys [:registry/status :registry/address]}]
   (let [registry (-> @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
-                                                           [:registry/deposit
-                                                            :registry/token
-                                                            [:registry/entries {:status status}
-                                                             [:reg-entry/address
-                                                              :reg-entry/title
-                                                              :reg-entry/description
-                                                              :reg-entry/status]]]]]}])
-                      :registry)
+                                                          [:registry/deposit
+                                                           :registry/token
+                                                           [:registry/entries {:status status}
+                                                            [:reg-entry/address
+                                                             :reg-entry/title
+                                                             :reg-entry/description
+                                                             :reg-entry/status]]]]]}])
+                     :registry)
         {:keys [:registry/deposit :registry/entries :registry/token]} registry]
     [:div.ui.segment
      [:h3 "Entries"]
      [:div.ui.list.entries
       (for [entry entries]
-        [entry-line token deposit entry])]]))
+        [entry-line status token deposit entry])]]))
 
 (defmethod page :route/registry-detail []
   (let [page-params (subscribe [::router-subs/active-page-params])
@@ -137,7 +137,7 @@
        [registry-detail-header {:registry/address (:registry-address @page-params)} ]
        [:div
         ;; TODO
-        [:div (str "SELECTED STATUS " @form-data)]
+        #_[:div (str "SELECTED STATUS " @form-data)]
         [:a.ui.button {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]
         [select-input {:form-data form-data
                        :id :status
