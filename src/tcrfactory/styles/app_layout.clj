@@ -12,6 +12,8 @@
    {:background-color (color :paper)}]
   [:.menu-section {}]
   [:.fftime {:z-index 10}]
+  [:.info-line {:display :flex}
+   [:span {:padding "0.4em"}]]
   [:.addr-section
    {:height (px 45)}
    [:.active-account-select

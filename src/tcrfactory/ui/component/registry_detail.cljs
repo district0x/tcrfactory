@@ -19,9 +19,9 @@
             [district.graphql-utils :as graphql-utils]))
 
 (defn info-line [[class label text]]
-  [:div.content
+  [:div.content.info-line
    {:class class}
-   [:span[:h4 label]]
+   [:span[:div.ui.header label]]
    [:span text]])
 
 (def time-formatter (time-format/formatter "yyyy-MM-dd"))
@@ -42,8 +42,8 @@
                                                                            :registry/token-total-supply
                                                                            :registry/token]]]}]))]
     [:div.ui.segment.registry-info
-     [:h3.ui.header title]
-     [:h3.ui.header description]
+     [:h1.ui.header title]
+     [:h3.ui.disabled.header description]
      (for [[index line] (map-indexed vector [[:created-on "Created On" (format-date created-on)]
                                              [:token-symbol "Symbol" token-symbol]
                                              [:total-supply "Supply" token-total-supply]
