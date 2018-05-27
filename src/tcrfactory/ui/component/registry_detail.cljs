@@ -72,10 +72,11 @@
                                                         :amount (:amount @form-data)
                                                         :vote-option option
                                                         :salt "a"}]))]
-   [:div.vote-form
-    [text-input {:form-data form-data :id :amount}]
-    [:button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
-    [:button {:on-click #(dispatch-commit-vote :vote.option/vote-against)} "Vote Against"]]))
+    (fn [{:keys [:registry/entry :registry/token]}]
+     [:div.vote-form
+      [text-input {:form-data form-data :id :amount}]
+      [:button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
+      [:button {:on-click #(dispatch-commit-vote :vote.option/vote-against)} "Vote Against"]])))
 
 (defn reveal-form [{:keys [:registry/entry]}]
   (let [active-account @(subscribe [::accounts-subs/active-account])

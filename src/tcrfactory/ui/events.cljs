@@ -190,9 +190,9 @@
                                               extra-data]
                                        :tx-opts {:from (accounts-q/active-account db)
                                                  :gas 3000000}
-                                       :on-tx-success [:commit-vote-success {:vote-option vote-option
-                                                                             :account (accounts-q/active-account db)
-                                                                             :reg-entry/address (look registry-entry)}]
+                                       :on-tx-success [:commit-vote-success (look {:vote-option vote-option
+                                                                              :account (accounts-q/active-account db)
+                                                                              :reg-entry/address registry-entry})]
                                        :on-tx-hash-error [:commit-vote-error]
                                        :on-tx-error [:commit-vote-error]}]})))
 
