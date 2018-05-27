@@ -73,9 +73,10 @@
                                                                           :description (:challenge/description @form-data)}])}
               "Submit challenge"]]]
            ;; when it's close
-           [:button.mini.ui.labeled.icon.button.challenge {:on-click #(reset! open? true)}
-            [:i.icon.chevron.down]
-            "Challenge"])]))))
+           [:div.ui.segment
+            [:button.mini.ui.labeled.icon.button.challenge {:on-click #(reset! open? true)}
+             [:i.icon.chevron.down]
+             "Challenge"]])]))))
 
 
 (defn vote-form [{:keys [:registry/entry :registry/token]}]
