@@ -27,9 +27,6 @@
 (def time-formatter (time-format/formatter "yyyy-MM-dd"))
 
 (defn format-date [date]
-
-  (prn "@formatter" date)
-
   (when date (time-format/unparse time-formatter date)))
 
 (defn registry-detail-header [{:keys [:registry/address]}]
@@ -44,14 +41,17 @@
                                                                            :registry/token-symbol
                                                                            :registry/token-total-supply
                                                                            :registry/token]]]}]))]
+    ;;TODO
+    (prn "@created-on" created-on)
+
     [:div.ui.segment.registry-info
-     [:h3.ui.header title]
-     [:h3.ui.header description]
-     (for [[index line] (map-indexed vector [[:created-on "Created On" (format-date created-on)]
-                                             [:token-symbol "Symbol" token-symbol]
-                                             [:total-supply "Supply" token-total-supply]
-                                             [:token "Token" token]])]
-       ^{:key index} [info-line line])]))
+        [:h3.ui.header title]
+        [:h3.ui.header description]
+        (for [[index line] (map-indexed vector [[:created-on "Created On" (format-date created-on)]
+                                                [:token-symbol "Symbol" token-symbol]
+                                                [:total-supply "Supply" token-total-supply]
+                                                [:token "Token" token]])]
+          ^{:key index} [info-line line])]))
 
 (defn challenge-form []
   (let [open? (reagent/atom false)
