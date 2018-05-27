@@ -9,7 +9,7 @@
     [tcrfactory.ui.component.app-layout :refer [app-layout]]
     [cljs-web3.core :as web3]))
 
-(def default-reg {:registry/token-name "TNAME", :registry/title "RTITE", :registry/challenge-period-duration 5555, :registry/deposit 444, :registry/token-symbol "TSYM", :registry/total-supply 2222222, :registry/reveal-period-duration 777777, :registry/commit-period-duration 6666, :registry/description "TDESC"})
+(def default-reg {:registry/token-name "some name", :registry/title "some title", :registry/challenge-period-duration 300, :registry/deposit 100, :registry/token-symbol "TKN", :registry/total-supply 1000000, :registry/reveal-period-duration 300, :registry/commit-period-duration 300, :registry/description "some description"})
 
 (defn create-registry [form-data _]
   (dispatch [:create-registry form-data]))
