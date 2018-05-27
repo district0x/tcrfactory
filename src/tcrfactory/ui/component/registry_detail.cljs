@@ -146,8 +146,8 @@
     [:div.ui.segment
      [:h3 "Entries"]
      [:div.ui.list.entries
-      (for [entry (filter :reg-entry/address entries)]
-        [entry-line status token deposit entry])]]))
+      (for [[index entry] (map-indexed vector (filter :reg-entry/address entries))]
+        ^{:key index} [entry-line status token deposit entry])]]))
 
 (defmethod page :route/registry-detail []
   (let [page-params (subscribe [::router-subs/active-page-params])
