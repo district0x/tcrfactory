@@ -31,9 +31,10 @@
                                                                 :registry/token-total-supply
                                                                 :registry/token]]]}]))]
     [:div.ui.segment.registry-info
-     [:h3 (:registry/title result)]
+     [:h2.ui.header (:registry/title result)]
+     [:h3.ui.header (:registry/description result)]
      (for [[index line] (map-indexed vector [[:created-on "Created On" (str (:registry/created-on result))]
-                                             [:description "Description" (:registry/description result)]
+                                             ;; [:description "Description" (:registry/description result)]
                                              [:token-symbol "Symbol" (:registry/token-symbol result)]
                                              [:total-supply "Supply" (:registry/token-total-supply result)]
                                              [:token "Token" (:registry/token result)]])]
@@ -133,7 +134,6 @@
                      :registry)
         {:keys [:registry/deposit :registry/entries :registry/token]} registry]
     [:div.ui.segment
-     [:h3 "Entries"]
      [:div.ui.list.entries
       (for [entry (filter :reg-entry/address entries)]
         [entry-line status token deposit entry])]]))
@@ -143,10 +143,11 @@
         form-data (reagent/atom {:status "regEntry_status_whitelisted"})]
     (fn []
       [app-layout
-       [:button {:on-click #(do
-                              (dispatch [::sync-now-events/increment-now 350])
-                              (web3-evm/mine! (web3 @re-frame.db/app-db) (fn [])))}
-        "Increase blockchain time by 350"]
+       [:div
+        [:button.ui.button {:on-click #(do
+                               (dispatch [::sync-now-events/increment-now 350])
+                               (web3-evm/mine! (web3 @re-frame.db/app-db) (fn [])))}
+         "Increase blockchain time by 350"]]
 
        [registry-detail-header {:registry/address (:registry-address @page-params)} ]
        [:div
@@ -182,11 +183,13 @@
            [with-label
             "Description"
             [text-input {:form-data form-data :id :description}]]]
-          [:div.ui.button {:on-click #(dispatch [:create-registry-entry (look {:registry-entry-factory entry-factory
-                                                                               :registry-token token
-                                                                               :deposit deposit
-                                                                               :title (:title @form-data)
-                                                                               :description (:description @form-data)})])}
+          [:div.ui.button.right.floated {:on-click #(dispatch [:create-registry-entry
+                                                               (look {:registry-entry-factory entry-factory
+                                                                      :registry-token token
+                                                                      :deposit deposit
+                                                                      :address address
+                                                                      :title (:title @form-data)
+                                                                      :description (:description @form-data)})])}
            "Submit"]]]))))
 
 (defmethod page :route/create-registry-entry []
