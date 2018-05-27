@@ -7,6 +7,8 @@
     [re-frame.core :refer [subscribe]]))
 
 (defmethod page :route/home []
-  [:div.welcome
+  [:div.welcome {:style {:text-align :center}}
+   
    [:h1 "TCR Factory"]
-   [main-menu nil]])
+   [main-menu nil]
+   [:img {:src "./logo@2x.png" :width "50%" :style {:margin-top "38px"}}]])
