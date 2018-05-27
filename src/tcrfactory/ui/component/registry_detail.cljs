@@ -57,9 +57,9 @@
                             :id :challenge/description}]]]
 
              [:button.ui.button {:on-click #(dispatch [:create-challenge {:registry-entry address
-                                                                :registry-token token
-                                                                :deposit deposit
-                                                                :description (:challenge/description @form-data)}])}
+                                                                          :registry-token token
+                                                                          :deposit deposit
+                                                                          :description (:challenge/description @form-data)}])}
               "Submit challenge"]]]
            ;; when it's close
            [:button.ui.button.challenge {:on-click #(reset! open? true)} ">>"])]))))
@@ -75,13 +75,14 @@
                                                         :vote-option option
                                                         :salt "a"}]))]
     (fn [{:keys [:registry/entry :registry/token]}]
-     [:div.ui.form.vote-form
-      [:div.ui.field
-       [int-input {:form-data form-data :id :amount}]
-       [:div.ui.buttons
-        [:button.ui.positive.button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
-        [:div.or]
-        [:button.ui.button {:on-click #(dispatch-commit-vote :vote.option/vote-against)} "Vote Against"]]]])))
+      [:div.ui.form.vote-form
+       [:div.inline.fields
+        [:div.ui.ten.wide.field
+         [int-input {:form-data form-data :id :amount}]
+         [:div.ui.buttons
+          [:button.ui.positive.button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
+          [:div.or]
+          [:button.ui.button {:on-click #(dispatch-commit-vote :vote.option/vote-against)} "Vote Against"]]]]])))
 
 (defn reveal-form [{:keys [:registry/entry]}]
   (let [active-account @(subscribe [::accounts-subs/active-account])
@@ -89,20 +90,26 @@
         vote-option @(subscribe [:vote-option {:reg-entry/address address
                                                :account active-account}])]
 
-   [:div.reveal-form
-    [:button {:on-click #(dispatch [:reveal-vote {:registry-entry entry
-                                                  :vote-option vote-option
-                                                  :salt "a"}])}
-     "Reveal"]])) (defn entry-line [status token deposit entry]
+    [:div.reveal-form
+     [:button {:on-click #(dispatch [:reveal-vote {:registry-entry entry
+                                                   :vote-option vote-option
+                                                   :salt "a"}])}
+      "Reveal"]]))
+
+(defn entry-line [status token deposit entry]
   [:div.item.line.reg-entry {:key (:reg-entry/address entry)}
    [:i.icon.star]
    [:div.content
     [:div.header.title (:reg-entry/title entry)]
     [:div.description (:reg-entry/description entry)]
-    (when-let [challenge-desc (:challenge/description entry)]
-      [:div.description.challenge
-       [:i.icon.balance.scale]
-       challenge-desc])
+    (let [challenge-desc (:challenge/description entry)]
+      (when-not (empty? challenge-desc)
+        [:div.ui.comments
+         [:div.comment.challenge
+          [:div.avatar
+           [:i.icon.balance.scale]]
+          [:div.text
+           challenge-desc]]]))
     (when status
       (case (graphql-utils/gql-name->kw status)
         :reg-entry.status/challenge-period [challenge-form {:registry/entry entry
@@ -145,13 +152,13 @@
        [:div
         ;; TODO
         #_[:div (str "SELECTED STATUS " @form-data)]
-        [:a.ui.button {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]
         [select-input {:form-data form-data
                        :id :status
                        :options [{:key "regEntry_status_whitelisted" :value "In Registry"}
                                  {:key "regEntry_status_challengePeriod" :value "In Challenge Period"}
                                  {:key "regEntry_status_commitPeriod" :value "In Voting Period"}
-                                 {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}]}]]
+                                 {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}]}]
+        [:a.ui.button {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]]
        [registry-entries {:registry/status (:status @form-data)
                           :registry/address (:registry-address @page-params)}]])))
 
@@ -189,21 +196,21 @@
 
 (comment
 
-@(subscribe [::gql/query {:queries [[:registry {:registry/address "0xae5354a23f499fbef180e6bdede13648e65dab34"}
-                                                           [:registry/deposit
-                                                            :registry/token
-                                                            [:registry/entries {:status "regEntry_status_whitelisted"}
-                                                             [:reg-entry/address
-                                                              :reg-entry/title
-                                                              :reg-entry/description
-                                                              :reg-entry/status]]]]]}])
+  @(subscribe [::gql/query {:queries [[:registry {:registry/address "0xae5354a23f499fbef180e6bdede13648e65dab34"}
+                                       [:registry/deposit
+                                        :registry/token
+                                        [:registry/entries {:status "regEntry_status_whitelisted"}
+                                         [:reg-entry/address
+                                          :reg-entry/title
+                                          :reg-entry/description
+                                          :reg-entry/status]]]]]}])
 
-(q/graphql-query {:queries [[:registry {:registry/address "0x733c88400438c8e71942f53dfb86d5c82a333b70"}
-                                                           [:registry/deposit
-                                                            :registry/token
-                                                            [:registry/entries {:status :reg-entry.status/whitelisted #_"regEntry_status_challengePeriod"}
-                                                             [:reg-entry/address
-                                                              :reg-entry/title
-                                                              :reg-entry/description
-                                                              :reg-entry/status]]]]]})
- )
+  (q/graphql-query {:queries [[:registry {:registry/address "0x733c88400438c8e71942f53dfb86d5c82a333b70"}
+                               [:registry/deposit
+                                :registry/token
+                                [:registry/entries {:status :reg-entry.status/whitelisted #_"regEntry_status_challengePeriod"}
+                                 [:reg-entry/address
+                                  :reg-entry/title
+                                  :reg-entry/description
+                                  :reg-entry/status]]]]]})
+  )
