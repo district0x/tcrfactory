@@ -120,8 +120,7 @@
                                    :output-dir "resources/public/js/compiled/out"
                                    :asset-path "js/compiled/out"
                                    :source-map-timestamp true
-                                   :preloads [print.foo.preloads.devtools
-                                              day8.re-frame-10x.preload]
+                                   :preloads [print.foo.preloads.devtools]
                                    :closure-defines {goog.DEBUG true}
                                    :external-config {:devtools/config {:features-to-install :all}}}}
                        {:id "dev-server"

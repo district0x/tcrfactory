@@ -2,7 +2,7 @@
   (:require [bignumber.core :as bn]
             [cljs-time.coerce :as time-coerce]
             [cljs-time.core :as t]
-            [cljs-time.format :as time-format]
+            #_[cljs-time.format :as time-format]
             [cljs.nodejs :as nodejs]
             [clojure.string :as str]
             [district.graphql-utils :as graphql-utils]
@@ -18,10 +18,6 @@
             [tcrfactory.server.contract.registry-entry :as sre]
             [tcrfactory.server.db :as meme-db]
             [tcrfactory.server.contract.registry-token :as registry-token]))
-
-(defn- to-millis [epoch]
-  (* 1000 epoch)
-  #_(time-format/unparse (time-format/formatters :date) (time-coerce/from-long epoch)))
 
 (def enum graphql-utils/kw->gql-name)
 
@@ -70,7 +66,6 @@
                            (let [entry-status (sre/status (:reg-entry/address reg-entry))]
                              (if (= status entry-status)
                                (conj m (merge reg-entry
-                                              {:reg-entry/created-on (to-millis created-on)}
                                               (when (contains? fields :reg-entry/status) {:reg-entry/status (enum status)})
                                               (when (contains? fields :reg-entry/status) {:challenge/votes-total (+ votes-for votes-against)})))
                                m)))
