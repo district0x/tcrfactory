@@ -72,10 +72,11 @@
                                                         :amount (:amount @form-data)
                                                         :vote-option option
                                                         :salt "a"}]))]
-   [:div.vote-form
-    [text-input {:form-data form-data :id :amount}]
-    [:button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
-    [:button {:on-click #(dispatch-commit-vote :vote.option/vote-against)} "Vote Against"]]))
+    (fn [{:keys [:registry/entry :registry/token]}]
+     [:div.vote-form
+      [text-input {:form-data form-data :id :amount}]
+      [:button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
+      [:button {:on-click #(dispatch-commit-vote :vote.option/vote-against)} "Vote Against"]])))
 
 (defn reveal-form [{:keys [:registry/entry]}]
   (let [active-account @(subscribe [::accounts-subs/active-account])
@@ -89,6 +90,22 @@
                                                   :salt "a"}])}
      "Reveal"]]))
 
+(defn entry-line [status token deposit entry]
+  [:div.item.line.reg-entry {:key (:reg-entry/address entry)}
+   [:i.icon.star]
+   [:div.content
+    [:div.header.title (:reg-entry/title entry)]
+    [:div.description (:reg-entry/description entry)]
+    (when status
+      (case (graphql-utils/gql-name->kw status)
+        :reg-entry.status/challenge-period [challenge-form {:registry/entry entry
+                                                            :registry/token token
+                                                            :registry/deposit deposit}]
+        :reg-entry.status/commit-period [vote-form {:registry/entry entry
+                                                    :registry/token token}]
+        :reg-entry.status/reveal-period [reveal-form {:registry/entry entry}]
+        nil))]])
+
 (defn registry-entries [{:keys [:registry/status :registry/address]}]
   (let [registry (-> @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
                                                           [:registry/deposit
@@ -100,21 +117,11 @@
                                                              :reg-entry/status]]]]]}])
                      :registry)
         {:keys [:registry/deposit :registry/entries :registry/token]} registry]
-    [:div
+    [:div.ui.segment
      [:h3 "Entries"]
-     (for [{:keys [:reg-entry/address :reg-entry/description :reg-entry/status :reg-entry/title] :as entry} entries]
-       ^{:key address} [:div.reg-entry {:style {:border "1px solid grey"}}
-                           [:div.title title]
-                           [:div.description description]
-                           (when status
-                             (case (graphql-utils/gql-name->kw status)
-                               :reg-entry.status/challenge-period [challenge-form {:registry/entry entry
-                                                                                   :registry/token token
-                                                                                   :registry/deposit deposit}]
-                               :reg-entry.status/commit-period [vote-form {:registry/entry entry
-                                                                           :registry/token token}]
-                               :reg-entry.status/reveal-period [reveal-form {:registry/entry entry}]
-                               nil))])]))
+     [:div.ui.list.entries
+      (for [entry (filter :reg-entry/address entries)]
+        [entry-line status token deposit entry])]]))
 
 (defmethod page :route/registry-detail []
   (let [page-params (subscribe [::router-subs/active-page-params])
