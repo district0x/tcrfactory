@@ -28,19 +28,17 @@
 
 (defn registries-list [term]
   (fn [term]
-    (let [registries @(subscribe [::gql/query {:queries [[:search-registries
-                                                          {:keyword term}
-                                                          [:registry/title
-                                                           :registry/description
-                                                           :registry/address]]]}])]
+    (let [{:keys [:search-registries] :as registries} @(subscribe [::gql/query {:queries [[:search-registries
+                                                                                           {:keyword term}
+                                                                                           [:registry/title
+                                                                                            :registry/description
+                                                                                            :registry/address]]]}])]
       [:div
-       (when (:search-registries registries)
+       (when search-registries
          [:div.ui.segment
           [:div.ui.list.registries
-           (doall
-            (map (fn [{:keys [:registry/address] :as line}]
-                   ^{:key address} [registry-line line])
-                 (:search-registries registries)))]])])))
+           (for [[index line] (map-indexed vector search-registries)]
+             ^{:key index} [registry-line line])]])])))
 
 (defmethod page :route/search-registries []
   (let [form-data (re/atom {:term ""})
