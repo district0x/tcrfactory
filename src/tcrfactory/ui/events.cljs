@@ -8,6 +8,7 @@
    [district.ui.web3-accounts.queries :as accounts-q]
    [district.ui.web3-sync-now.events :as sync-now-events]
    [district.ui.web3-tx.events :as tx-events]
+   [district.ui.router.events :as router-events]
    [re-frame.core :as re-frame :refer [reg-event-fx reg-event-db trim-v console dispatch]]
    [tcrfactory.shared.contract.registry-entry :refer [vote-option->num]]))
 
@@ -90,7 +91,8 @@
   interceptors
   (fn [{:keys [db]} args]
     (console :log :create-registry-success args)
-    nil))
+    {:dispatch-later [{:ms 1000
+                       :dispatch [::router-events/navigate :route/search-registries]}]}))
 
 
 (reg-event-fx
@@ -104,7 +106,10 @@
 (reg-event-fx
   :create-registry-entry
   interceptors
-  (fn [{:keys [db]} [{:keys [:registry-entry-factory :registry-token :deposit :title :description]}]]
+  (fn [{:keys [db]} [{:keys [:registry-entry-factory :registry-token :deposit :title :description
+                            :registry-address]}]]
+
+    (console :log :create-registry-entry registry-address)
     (let [extra-data (web3-eth/contract-get-data (contract-q/instance db :registry-entry-factory)
                                                  :create-registry-entry
                                                  (accounts-q/active-account db)
@@ -117,7 +122,8 @@
                                               extra-data]
                                        :tx-opts {:from (accounts-q/active-account db)
                                                  :gas 3000000}
-                                       :on-tx-success [:create-registry-entry-success]
+                                       :on-tx-success [:create-registry-entry-success
+                                                       {:registry-address registry-address}]
                                        :on-tx-hash-error [:create-registry-entry-error]
                                        :on-tx-error [:create-registry-entry-error]}]})))
 
@@ -125,9 +131,10 @@
 (reg-event-fx
   :create-registry-entry-success
   interceptors
-  (fn [{:keys [db]} args]
-    (console :log :create-registry-entry-success args)
-    nil))
+  (fn [{:keys [db]} [orig args]]
+    (console :log :create-registry-entry-success orig args)
+    {:dispatch-later [{:ms 400
+                       :dispatch [::router-events/navigate :route/registry-detail orig]}]}))
 
 
 (reg-event-fx

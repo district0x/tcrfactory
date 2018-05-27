@@ -42,9 +42,9 @@
                                                                            :registry/token-total-supply
                                                                            :registry/token]]]}]))]
     [:div.ui.segment.registry-info
-     [:h3 title ]
+     [:h3.ui.header title]
+     [:h3.ui.header description]
      (for [[index line] (map-indexed vector [[:created-on "Created On" (format-date created-on)]
-                                             [:description "Description" description]
                                              [:token-symbol "Symbol" token-symbol]
                                              [:total-supply "Supply" token-total-supply]
                                              [:token "Token" token]])]
@@ -132,19 +132,20 @@
         nil))]])
 
 (defn registry-entries [{:keys [:registry/status :registry/address]}]
-  (let [registry (-> @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
-                                                          [:registry/deposit
-                                                           :registry/token
-                                                           [:registry/entries {:status status}
-                                                            [:reg-entry/address
-                                                             :reg-entry/title
-                                                             :challenge/description
-                                                             :reg-entry/description
-                                                             :reg-entry/status]]]]]}])
+  (let [registry (-> @(subscribe [::gql/query
+                                  {:queries [[:registry {:registry/address address}
+                                              [:registry/deposit
+                                               :registry/token
+                                               [:registry/entries {:status status}
+                                                [:reg-entry/address
+                                                 :reg-entry/title
+                                                 :challenge/description
+                                                 :reg-entry/description
+                                                 :reg-entry/status]]]]]}
+                                  {:refetch-on #{:create-registry-entry-success}}])
                      :registry)
         {:keys [:registry/deposit :registry/entries :registry/token]} registry]
     [:div.ui.segment
-     [:h3 "Entries"]
      [:div.ui.list.entries
       (for [[index entry] (map-indexed vector (filter :reg-entry/address entries))]
         ^{:key index} [entry-line status token deposit entry])]]))
@@ -154,10 +155,11 @@
         form-data (reagent/atom {:status "regEntry_status_whitelisted"})]
     (fn []
       [app-layout
-       [:button {:on-click #(do
-                              (dispatch [::sync-now-events/increment-now 350])
-                              (web3-evm/mine! (web3 @re-frame.db/app-db) (fn [])))}
-        "Increase blockchain time by 350"]
+       [:div
+        [:button.ui.button {:on-click #(do
+                               (dispatch [::sync-now-events/increment-now 350])
+                               (web3-evm/mine! (web3 @re-frame.db/app-db) (fn [])))}
+         "Increase blockchain time by 350"]]
 
        [registry-detail-header {:registry/address (:registry-address @page-params)} ]
        [:div
@@ -193,11 +195,13 @@
            [with-label
             "Description"
             [text-input {:form-data form-data :id :description}]]]
-          [:div.ui.button {:on-click #(dispatch [:create-registry-entry (look {:registry-entry-factory entry-factory
-                                                                               :registry-token token
-                                                                               :deposit deposit
-                                                                               :title (:title @form-data)
-                                                                               :description (:description @form-data)})])}
+          [:div.ui.button.right.floated {:on-click #(dispatch [:create-registry-entry
+                                                               (look {:registry-entry-factory entry-factory
+                                                                      :registry-token token
+                                                                      :deposit deposit
+                                                                      :registry-address address
+                                                                      :title (:title @form-data)
+                                                                      :description (:description @form-data)})])}
            "Submit"]]]))))
 
 (defmethod page :route/create-registry-entry []
@@ -224,5 +228,6 @@
                                  [:reg-entry/address
                                   :reg-entry/title
                                   :reg-entry/description
-                                  :reg-entry/status]]]]]})
+                                  :reg-entry/status]]]]]
+                    })
   )
