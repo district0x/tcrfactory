@@ -14,6 +14,8 @@
             [tcrfactory.ui.component.app-layout :refer [app-layout]]
             [tcrfactory.ui.element.inputs :refer [text-input int-input select-input with-label]]
             [district.ui.web3-accounts.subs :as accounts-subs]
+            [cljs-time.format :as time-format]
+            [cljs-time.core :as time]
             [district.graphql-utils :as graphql-utils]))
 
 (defn info-line [[class label text]]
@@ -22,21 +24,30 @@
    [:span[:h4 label]]
    [:span text]])
 
+(def time-formatter (time-format/formatter "yyyy-MM-dd"))
+
+(defn format-date [date]
+  (when date (time-format/unparse time-formatter date)))
+
 (defn registry-detail-header [{:keys [:registry/address]}]
-  (let [result (:registry @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
-                                                               [:registry/created-on
-                                                                :registry/title
-                                                                :registry/description
-                                                                :registry/token-symbol
-                                                                :registry/token-total-supply
-                                                                :registry/token]]]}]))]
+  (let [{:keys [:registry/created-on :registry/title
+                :registry/description
+                :registry/token-symbol
+                :registry/token-total-supply
+                :registry/token] :as result} (:registry @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
+                                                                          [:registry/created-on
+                                                                           :registry/title
+                                                                           :registry/description
+                                                                           :registry/token-symbol
+                                                                           :registry/token-total-supply
+                                                                           :registry/token]]]}]))]
     [:div.ui.segment.registry-info
-     [:h3 (:registry/title result)]
-     (for [[index line] (map-indexed vector [[:created-on "Created On" (str (:registry/created-on result))]
-                                             [:description "Description" (:registry/description result)]
-                                             [:token-symbol "Symbol" (:registry/token-symbol result)]
-                                             [:total-supply "Supply" (:registry/token-total-supply result)]
-                                             [:token "Token" (:registry/token result)]])]
+     [:h3 title ]
+     (for [[index line] (map-indexed vector [[:created-on "Created On" (format-date created-on)]
+                                             [:description "Description" description]
+                                             [:token-symbol "Symbol" token-symbol]
+                                             [:total-supply "Supply" token-total-supply]
+                                             [:token "Token" token]])]
        ^{:key index} [info-line line])]))
 
 (defn challenge-form []
