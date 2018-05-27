@@ -21,7 +21,7 @@
 (defn info-line [[class label text]]
   [:div.content.info-line
    {:class class}
-   [:span[:div.ui.header label]]
+   [:span [:div.ui.header label]]
    [:span text]])
 
 (def time-formatter (time-format/formatter "yyyy-MM-dd"))
@@ -35,12 +35,12 @@
                 :registry/token-symbol
                 :registry/token-total-supply
                 :registry/token] :as result} (:registry @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
-                                                                          [:registry/created-on
-                                                                           :registry/title
-                                                                           :registry/description
-                                                                           :registry/token-symbol
-                                                                           :registry/token-total-supply
-                                                                           :registry/token]]]}]))]
+                                                                                             [:registry/created-on
+                                                                                              :registry/title
+                                                                                              :registry/description
+                                                                                              :registry/token-symbol
+                                                                                              :registry/token-total-supply
+                                                                                              :registry/token]]]}]))]
     [:div.ui.segment.registry-info
      [:h1.ui.header title]
      [:h3.ui.disabled.header description]
@@ -105,9 +105,9 @@
                                                :account active-account}])]
 
     [:div.reveal-form
-     [:button {:on-click #(dispatch [:reveal-vote {:registry-entry entry
-                                                   :vote-option vote-option
-                                                   :salt "a"}])}
+     [:button.ui.button {:on-click #(dispatch [:reveal-vote {:registry-entry entry
+                                                             :vote-option vote-option
+                                                             :salt "a"}])}
       "Reveal"]]))
 
 (defn entry-line [status token deposit entry]
@@ -148,7 +148,7 @@
                                   {:refetch-on #{:create-registry-entry-success
                                                  ::sync-now-events/set-now
                                                  :create-challenge-success}}])
-                     :registry)
+                   :registry)
         {:keys [:registry/deposit :registry/entries :registry/token]} registry]
     [:div.ui.segment
      [:div.ui.list.entries
@@ -162,12 +162,12 @@
       [app-layout
        [:div
         [:button.ui.labeled.icon.right.floated.button.fftime {:on-click #(do
-                               (dispatch [::sync-now-events/increment-now 350])
-                               (web3-evm/mine! (web3 @re-frame.db/app-db) (fn [])))}
+                                                                           (dispatch [::sync-now-events/increment-now 350])
+                                                                           (web3-evm/mine! (web3 @re-frame.db/app-db) (fn [])))}
          [:i.icon.fast.forward]
          "Increase time "]]
 
-       [registry-detail-header {:registry/address (:registry-address @page-params)} ]
+       [registry-detail-header {:registry/address (:registry-address @page-params)}]
        [:div
         ;; TODO
         #_[:div (str "SELECTED STATUS " @form-data)]
