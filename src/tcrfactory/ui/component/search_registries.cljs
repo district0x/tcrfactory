@@ -12,12 +12,7 @@
 (defn search-form [form-data errors]
   [:div.ui.form
    [:div.field
-    [:label "Keyword:"
-     
-     #_[:input {:type "text"
-                :on-change (fn [e]
-                             (let [value (aget e "target" "value")]
-                               (reset! term-atom value)))}]]
+    [:label "Keyword:"]
     [text-input {:form-data form-data
                  :errors errors
                  :id :term}]]])
@@ -32,29 +27,23 @@
      (:registry/description data)]]])
 
 (defn registries-list [term]
-  (let []
-    (fn [term]
-      (let [registries @(subscribe [::gql/query {:queries [[:search-registries
-                                                           {:keyword term}
-                                                           [:registry/title
-                                                            :registry/description
-                                                            :registry/address]]]}])]
-        (println term)
-        (println registries)
-        [:div
-         (when (:search-registries registries)
-           [:div.ui.segment
-            [:div.ui.list.registries
-             (doall
-              (map (fn [line]
-                     ^{:key (:registry/address line)}
-                     [registry-line line])
-                   (:search-registries registries)))
-             ;; (str @registries)
-             ]])]))))
+  (fn [term]
+    (let [registries @(subscribe [::gql/query {:queries [[:search-registries
+                                                          {:keyword term}
+                                                          [:registry/title
+                                                           :registry/description
+                                                           :registry/address]]]}])]
+      [:div
+       (when (:search-registries registries)
+         [:div.ui.segment
+          [:div.ui.list.registries
+           (doall
+            (map (fn [{:keys [:registry/address] :as line}]
+                   ^{:key address} [registry-line line])
+                 (:search-registries registries)))]])])))
 
 (defmethod page :route/search-registries []
-  (let [form-data (re/atom {})
+  (let [form-data (re/atom {:term ""})
         errors (re/atom {})]
     (fn []
       [app-layout
@@ -63,5 +52,4 @@
          [:h1 (str "Search Registries")]
          [:div.ui.hidden.divider]
          [search-form form-data errors]]
-        [registries-list (:term @form-data)]
-        ]])))
+        [registries-list (:term @form-data)]]])))

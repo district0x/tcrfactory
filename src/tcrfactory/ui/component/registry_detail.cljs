@@ -22,8 +22,6 @@
    [:span[:h4 label]]
    [:span text]])
 
-
-
 (defn registry-detail-header [{:keys [:registry/address]}]
   (let [result (:registry @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
                                                                [:registry/created-on

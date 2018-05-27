@@ -26,7 +26,7 @@
 
 (defn- resolver-fields
   "Returns the first order fields"
-  [info] (->> (-> info
+  [debug] (->> (-> debug
                   graphql-fields
                   js->clj)
               keys
@@ -49,7 +49,7 @@
 ;;     :else                                               "regEntry_status_blacklisted" #_:reg-entry.status/blacklisted))
 
 (defn registry-entries-resolver [{:keys [:reg-entry/registry :reg-entry/status] :as args} context document]
-  (log/info "registry-entries resolver args" args)
+  (log/debug "registry-entries resolver args" args)
   (let [fields (resolver-fields document)
         sql-query (db/all {:select (into [:challenge/votes-for
                                           :challenge/votes-against
@@ -60,10 +60,10 @@
                            :from [:reg-entries]
                            :where [:= registry :reg-entries.reg-entry/registry]})
         now (last-block-timestamp)]
-    (log/info "registry-entries fields" fields)
+    (log/debug "registry-entries fields" fields)
     (reduce (fn [m {:keys [:challenge/votes-for :challenge/votes-against] :as reg-entry}]
               (let [entry-status (sre/status (:reg-entry/address reg-entry))]
-                (log/info status entry-status)
+                (log/debug status entry-status)
                 (if (= status entry-status)
                   (conj m (merge reg-entry
                                  (when (contains? fields :reg-entry/status) {:reg-entry/status (enum status)})
@@ -85,12 +85,14 @@
                                                            context document))})))
 
 (defn search-registries-resolver [{:keys [keyword] :as args} context document]
-  (log/info ":registry " args)
-  (db/all {:select [:*]
-           :from [:registries]
-           :where [:or
-                   [:like (sql/call :upper :registries.registry/title) (str/upper-case (str "%" keyword "%"))]
-                   [:like (sql/call :upper :registries.registry/description) (str/upper-case (str "%" keyword "%"))]]}))
+  (log/debug "search-registry args" args)
+  (let [sql-query (db/all (merge {:select [:*]
+                                  :from [:registries]}
+                                 (when keyword {:where [:or
+                                                        [:like (sql/call :upper :registries.registry/title) (str/upper-case (str "%" keyword "%"))]
+                                                        [:like (sql/call :upper :registries.registry/description) (str/upper-case (str "%" keyword "%"))]]})))]
+    (log/debug "search-registry query" sql-query)
+    sql-query))
 
 (def graphql-resolvers
   {:registry registry-resolver
