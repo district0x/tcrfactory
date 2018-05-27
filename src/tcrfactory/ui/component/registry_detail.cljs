@@ -161,10 +161,11 @@
     (fn []
       [app-layout
        [:div
-        [:button.ui.button {:on-click #(do
+        [:button.ui.labeled.icon.right.floated.button.fftime {:on-click #(do
                                (dispatch [::sync-now-events/increment-now 350])
                                (web3-evm/mine! (web3 @re-frame.db/app-db) (fn [])))}
-         "Increase blockchain time by 350"]]
+         [:i.icon.fast.forward]
+         "Increase time "]]
 
        [registry-detail-header {:registry/address (:registry-address @page-params)} ]
        [:div
@@ -175,7 +176,9 @@
                        :options [{:key "regEntry_status_whitelisted" :value "In Registry"}
                                  {:key "regEntry_status_challengePeriod" :value "In Challenge Period"}
                                  {:key "regEntry_status_commitPeriod" :value "In Voting Period"}
-                                 {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}]}]
+                                 {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}
+                                 {:key "regEntry_status_blacklisted" :value "Blacklisted"}
+                                 ]}]
         [:a.ui.button.right.floated {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
          "Submit Item"]]
        [registry-entries {:registry/status (:status @form-data)

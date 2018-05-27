@@ -11,6 +11,7 @@
   [:body
    {:background-color (color :paper)}]
   [:.menu-section {}]
+  [:.fftime {:z-index 10}]
   [:.addr-section
    {:height (px 45)}
    [:.active-account-select
