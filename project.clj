@@ -9,7 +9,6 @@
                  [com.andrewmcveigh/cljs-time "0.5.2"]
                  [com.taoensso/encore "2.92.0"]
                  [com.taoensso/timbre "4.10.0"]
-                 [day8.re-frame/re-frame-10x "0.3.1"]
                  [district0x/bignumber "1.0.1"]
                  [district0x/cljs-solidity-sha3 "1.0.0"]
                  [district0x/district-cljs-utils "1.0.3"]
@@ -49,7 +48,13 @@
                  [mount "0.1.12"]
                  [org.clojure/clojurescript "1.10.238"]
                  [print-foo-cljs "2.0.3"]
-                 [re-frame "0.10.5"]]
+                 [re-frame "0.10.5"]
+                 [cljsjs/react-dom "15.3.0-0"]
+                 [cljsjs/react-with-addons "15.3.0-0"]]
+
+  :exclusions [[cljsjs/react-dom]
+               [cljsjs/react]
+               [re-frame]]
 
   :plugins [[lein-auto "0.1.2"]
             [lein-cljsbuild "1.1.7"]
@@ -117,8 +122,7 @@
                                    :source-map-timestamp true
                                    :preloads [print.foo.preloads.devtools
                                               day8.re-frame-10x.preload]
-                                   :closure-defines {goog.DEBUG true
-                                                     "re_frame.trace.trace_enabled_QMARK_" false}
+                                   :closure-defines {goog.DEBUG true}
                                    :external-config {:devtools/config {:features-to-install :all}}}}
                        {:id "dev-server"
                         :source-paths ["src/tcrfactory/server" "src/tcrfactory/shared"]
