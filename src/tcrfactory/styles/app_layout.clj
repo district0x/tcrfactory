@@ -10,6 +10,11 @@
 (defstyles core
   [:body
    {:background-color (color :paper)}]
+   [:.content {}
+    [:.header.title {:font-size (px 18)
+                     :line-height (px 25)}]
+    [:.description {:font-size (px 15)
+                    :margin-bottom (px 5)}]]
   [:.menu-section {}]
   [:.fftime {:z-index 1}]
   [:.info-line {:display :flex}
@@ -17,7 +22,8 @@
   [:.addr-section
    {:height (px 45)}
    [:.active-account-select
-    {:height (px 45)}]]
+    {:height (px 45)
+     :text-overflow "ellipsis"}]]
   [:.app-container
    {:display :grid
     :height "100%"}
@@ -39,4 +45,6 @@
    [:.ui.segment
     {:border-style :none
      :box-shadow :none}]
+   [:.newspaper
+    {:margin-top (px 5)}]
    ])

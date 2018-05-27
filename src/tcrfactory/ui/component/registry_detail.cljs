@@ -39,20 +39,20 @@
                     :registry/token-total-supply
                     :registry/token-balance
                     :registry/deposit
-                    :registry/token] :as result} (:registry @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
-                                                                                                 [:registry/created-on
-                                                                                                  :registry/title
-                                                                                                  :registry/description
-                                                                                                  :registry/token-symbol
-                                                                                                  :registry/token-total-supply
-                                                                                                  :registry/token
-                                                                                                  :registry/deposit
-                                                                                                  [:registry/token-balance {:account @active-account}]]]]}
-                                                                                     {:refetch-on #{:create-registry-entry-success
-                                                                                                    ::sync-now-events/set-now
-                                                                                                    :create-challenge-success
-                                                                                                    :commit-vote-success
-                                                                                                    :reveal-vote-success}}]))]
+                    :registry/token]} (:registry @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
+                                                                                      [:registry/created-on
+                                                                                       :registry/title
+                                                                                       :registry/description
+                                                                                       :registry/token-symbol
+                                                                                       :registry/token-total-supply
+                                                                                       :registry/token
+                                                                                       :registry/deposit
+                                                                                       [:registry/token-balance {:account @active-account}]]]]}
+                                                              {:refetch-on #{:create-registry-entry-success
+                                                                             ::sync-now-events/set-now
+                                                                             :create-challenge-success
+                                                                             :commit-vote-success
+                                                                             :reveal-vote-success}}]))]
         [:div.ui.segment.registry-info
          [:h1.ui.header title]
          [:h3.ui.disabled.header description]
