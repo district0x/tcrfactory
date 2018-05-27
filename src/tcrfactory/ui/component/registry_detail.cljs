@@ -15,19 +15,20 @@
             [tcrfactory.ui.element.inputs :refer [text-input int-input select-input with-label]]
             [district.ui.web3-accounts.subs :as accounts-subs]
             [cljs-time.format :as time-format]
+            [cljs-time.coerce :as time-coerce]
             [cljs-time.core :as time]
             [district.graphql-utils :as graphql-utils]))
 
 (defn info-line [[class label text]]
-  [:div.content
+  [:div.content.info-line
    {:class class}
-   [:span[:h4 label]]
+   [:span[:div.ui.header label]]
    [:span text]])
 
 (def time-formatter (time-format/formatter "yyyy-MM-dd"))
 
 (defn format-date [date]
-  (when date (time-format/unparse time-formatter date)))
+  (when date (time-format/unparse (time-format/formatters :date) (time-coerce/from-long (* 1000 date)))))
 
 (defn registry-detail-header [{:keys [:registry/address]}]
   (let [{:keys [:registry/created-on :registry/title
@@ -35,23 +36,20 @@
                 :registry/token-symbol
                 :registry/token-total-supply
                 :registry/token] :as result} (:registry @(subscribe [::gql/query {:queries [[:registry {:registry/address address}
-                                                                          [:registry/created-on
-                                                                           :registry/title
-                                                                           :registry/description
-                                                                           :registry/token-symbol
-                                                                           :registry/token-total-supply
-                                                                           :registry/token]]]}]))]
-    ;;TODO
-    (prn "@created-on" created-on)
-
+                                                                                             [:registry/created-on
+                                                                                              :registry/title
+                                                                                              :registry/description
+                                                                                              :registry/token-symbol
+                                                                                              :registry/token-total-supply
+                                                                                              :registry/token]]]}]))]
     [:div.ui.segment.registry-info
-        [:h3.ui.header title]
-        [:h3.ui.header description]
-        (for [[index line] (map-indexed vector [[:created-on "Created On" (format-date created-on)]
-                                                [:token-symbol "Symbol" token-symbol]
-                                                [:total-supply "Supply" token-total-supply]
-                                                [:token "Token" token]])]
-          ^{:key index} [info-line line])]))
+     [:h1.ui.header title]
+     [:h3.ui.disabled.header description]
+     (for [[index line] (map-indexed vector [[:created-on "Created On" (format-date created-on)]
+                                             [:token-symbol "Symbol" token-symbol]
+                                             [:total-supply "Supply" (web3/from-wei token-total-supply :ether)]
+                                             [:token "Token" token]])]
+       ^{:key index} [info-line line])]))
 
 (defn challenge-form []
   (let [open? (reagent/atom false)
@@ -76,9 +74,10 @@
                                                                           :description (:challenge/description @form-data)}])}
               "Submit challenge"]]]
            ;; when it's close
-           [:button.mini.ui.labeled.icon.button.challenge {:on-click #(reset! open? true)}
-            [:i.icon.chevron.down]
-            "Challenge"])]))))
+           [:div.ui.segment
+            [:button.mini.ui.labeled.icon.button.challenge {:on-click #(reset! open? true)}
+             [:i.icon.chevron.down]
+             "Challenge"]])]))))
 
 
 (defn vote-form [{:keys [:registry/entry :registry/token]}]
@@ -163,10 +162,11 @@
     (fn []
       [app-layout
        [:div
-        [:button.ui.button {:on-click #(do
+        [:button.ui.labeled.icon.right.floated.button.fftime {:on-click #(do
                                (dispatch [::sync-now-events/increment-now 350])
                                (web3-evm/mine! (web3 @re-frame.db/app-db) (fn [])))}
-         "Increase blockchain time by 350"]]
+         [:i.icon.fast.forward]
+         "Increase time "]]
 
        [registry-detail-header {:registry/address (:registry-address @page-params)} ]
        [:div
@@ -177,7 +177,9 @@
                        :options [{:key "regEntry_status_whitelisted" :value "In Registry"}
                                  {:key "regEntry_status_challengePeriod" :value "In Challenge Period"}
                                  {:key "regEntry_status_commitPeriod" :value "In Voting Period"}
-                                 {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}]}]
+                                 {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}
+                                 {:key "regEntry_status_blacklisted" :value "Blacklisted"}
+                                 ]}]
         [:a.ui.button.right.floated {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
          "Submit Item"]]
        [registry-entries {:registry/status (:status @form-data)

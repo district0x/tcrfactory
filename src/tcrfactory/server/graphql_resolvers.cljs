@@ -18,8 +18,8 @@
             [tcrfactory.server.contract.registry-entry :as sre]
             [tcrfactory.server.db :as meme-db]))
 
-(defn- from-epoch [epoch]
-  (time-coerce/from-long epoch)
+(defn- to-millis [epoch]
+  (* 1000 date)
   #_(time-format/unparse (time-format/formatters :date) (time-coerce/from-long epoch)))
 
 (def enum graphql-utils/kw->gql-name)
@@ -69,7 +69,7 @@
                            (let [entry-status (sre/status (:reg-entry/address reg-entry))]
                              (if (= status entry-status)
                                (conj m (merge reg-entry
-                                              {:reg-entry/created-on (from-epoch (* 1000 created-on))}
+                                              {:reg-entry/created-on (to-millis created-on)}
                                               (when (contains? fields :reg-entry/status) {:reg-entry/status (enum status)})
                                               (when (contains? fields :reg-entry/status) {:challenge/votes-total (+ votes-for votes-against)})))
                                m)))
