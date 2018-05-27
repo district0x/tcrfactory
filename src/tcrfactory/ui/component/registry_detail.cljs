@@ -88,7 +88,7 @@
     (fn [{:keys [:registry/entry :registry/token]}]
       [:div.ui.form.vote-form
        [:div.inline.fields
-        [:div.ui.ten.wide.field
+        [:div.ui.field
          [int-input {:form-data form-data :id :amount}]
          [:div.ui.buttons
           [:button.ui.positive.button {:on-click #(dispatch-commit-vote :vote.option/vote-for)} "Vote For"]
@@ -169,7 +169,8 @@
                                  {:key "regEntry_status_challengePeriod" :value "In Challenge Period"}
                                  {:key "regEntry_status_commitPeriod" :value "In Voting Period"}
                                  {:key "regEntry_status_revealPeriod" :value "In Reveal Period"}]}]
-        [:a.ui.button {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))} "Submit Item"]]
+        [:a.ui.button.right.floated {:href (str "#" (router-utils/resolve :route/create-registry-entry @page-params))}
+         "Submit Item"]]
        [registry-entries {:registry/status (:status @form-data)
                           :registry/address (:registry-address @page-params)}]])))
 
